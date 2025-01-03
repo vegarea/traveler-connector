@@ -1,28 +1,19 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-
-import Index from "./pages/Index";
-import Profile from "./pages/Profile";
-import Admin from "./pages/Admin";
-
-const queryClient = new QueryClient();
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Profile from './pages/Profile';
+import MemberProfile from './pages/MemberProfile';
+import Index from './pages/Index';
+import AdminLayout from './pages/AdminLayout';
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/admin" element={<Admin />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/members/:username" element={<MemberProfile />} />
+        <Route path="/admin/*" element={<AdminLayout />} />
+      </Routes>
+    </Router>
   );
 }
 

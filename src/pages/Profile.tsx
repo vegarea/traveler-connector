@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,24 +12,49 @@ import PublishedTrips from '@/components/PublishedTrips';
 import TravelGroups from '@/components/TravelGroups';
 import { useWordPressConfig } from '@/components/wordpress/hooks/useWordPressConfig';
 import { useWordPressUser } from '@/components/wordpress/hooks/useWordPressUser';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
-const Profile = () => {
-  const { data: wpConfig, error: configError } = useWordPressConfig();
-  const { data: wpUserData, isLoading } = useWordPressUser(wpConfig);
+interface ProfileProps {
+  userId?: string;
+}
 
-  if (configError) {
-    return (
-      <div className="min-h-screen bg-background p-4">
-        <Card>
-          <CardContent className="p-6">
-            <p className="text-muted-foreground">Error al cargar la configuración de WordPress</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+const Profile: React.FC<ProfileProps> = ({ userId }) => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
-  if (isLoading) {
+  // Fetch user data if userId is provided
+  const { data: userData, isLoading: userLoading } = useQuery({
+    queryKey: ['user-data', userId],
+    queryFn: async () => {
+      if (!userId) return null;
+      
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!userId,
+    meta: {
+      onError: () => {
+        toast({
+          title: "Error",
+          description: "No se pudo cargar la información del usuario",
+          variant: "destructive",
+        });
+      }
+    }
+  });
+
+  const { data: wpConfig } = useWordPressConfig();
+  const { data: wpUserData, isLoading: wpLoading } = useWordPressUser(wpConfig);
+
+  if (userLoading || wpLoading) {
     return (
       <div className="min-h-screen bg-background p-4">
         <Card>
@@ -40,12 +66,17 @@ const Profile = () => {
     );
   }
 
+  const displayData = userId ? userData : wpUserData;
+  const wpProfileUrl = userId 
+    ? `${wpConfig?.wp_url}/members/${userData?.username}`
+    : wpUserData?.link;
+
   return (
     <div className="min-h-screen bg-background">
       {/* Cover Photo */}
       <div className="relative h-[300px] w-full">
         <img
-          src={wpUserData?.banner_url || "https://images.unsplash.com/photo-1469474968028-56623f02e42e"}
+          src={displayData?.cover_url || "https://images.unsplash.com/photo-1469474968028-56623f02e42e"}
           alt="Cover"
           className="w-full h-full object-cover"
         />
@@ -58,21 +89,21 @@ const Profile = () => {
           {/* Avatar and Basic Info */}
           <div className="flex flex-col items-center">
             <Avatar className="w-32 h-32 border-4 border-background">
-              <AvatarImage src={wpUserData?.avatar_urls?.['96'] || ''} />
+              <AvatarImage src={displayData?.avatar_url || ''} />
               <AvatarFallback>
-                {wpUserData?.name ? wpUserData.name.charAt(0) : 'U'}
+                {displayData?.username ? displayData.username.charAt(0).toUpperCase() : 'U'}
               </AvatarFallback>
             </Avatar>
-            <h1 className="mt-4 text-3xl font-bold">{wpUserData?.name || 'Usuario'}</h1>
+            <h1 className="mt-4 text-3xl font-bold">{displayData?.username || 'Usuario'}</h1>
             <p className="mt-2 text-muted-foreground text-center max-w-2xl">
-              {wpUserData?.description || 'Sin descripción'}
+              {displayData?.description || 'Sin descripción'}
             </p>
-            {wpUserData?.link && (
+            {wpProfileUrl && (
               <Button
                 variant="outline"
                 size="sm"
                 className="mt-4"
-                onClick={() => window.open(wpUserData.link, '_blank')}
+                onClick={() => window.open(wpProfileUrl, '_blank')}
               >
                 <ExternalLink className="w-4 h-4 mr-2" />
                 Ver perfil en WordPress
