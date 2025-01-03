@@ -9,85 +9,12 @@ import ProfileStats from '@/components/ProfileStats';
 import TravelBadges from '@/components/TravelBadges';
 import PublishedTrips from '@/components/PublishedTrips';
 import TravelGroups from '@/components/TravelGroups';
-import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
-import { useToast } from "@/hooks/use-toast";
+import { useWordPressConfig } from '@/components/wordpress/hooks/useWordPressConfig';
+import { useWordPressUser } from '@/components/wordpress/hooks/useWordPressUser';
 
 const Profile = () => {
-  const { toast } = useToast();
-
-  // Fetch WordPress config
-  const { data: wpConfig, error: configError } = useQuery({
-    queryKey: ['wordpress-config'],
-    queryFn: async () => {
-      console.log('Fetching WordPress config...');
-      const { data, error } = await supabase
-        .from('wordpress_config')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(1);
-
-      if (error) {
-        console.error('Error fetching WordPress config:', error);
-        throw error;
-      }
-
-      if (!data || data.length === 0) {
-        throw new Error('No WordPress configuration found');
-      }
-
-      console.log('WordPress config fetched:', data[0]);
-      return data[0];
-    },
-    retry: 1,
-    onError: (error) => {
-      console.error('WordPress config fetch error:', error);
-      toast({
-        title: "Error",
-        description: "No se pudo cargar la configuración de WordPress",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Fetch WordPress user data
-  const { data: wpUserData, isLoading } = useQuery({
-    queryKey: ['wordpress-user', wpConfig?.wp_url],
-    queryFn: async () => {
-      if (!wpConfig?.wp_url || !wpConfig?.wp_token || !wpConfig?.wp_username) {
-        throw new Error('WordPress configuration is incomplete');
-      }
-
-      console.log('Fetching WordPress user data...');
-      // Usar autenticación Basic con usuario y token
-      const response = await fetch(`${wpConfig.wp_url}/wp-json/wp/v2/users/me`, {
-        headers: {
-          'Authorization': `Basic ${btoa(`${wpConfig.wp_username}:${wpConfig.wp_token}`)}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('WordPress API Error:', errorText);
-        throw new Error('Failed to fetch WordPress user data');
-      }
-
-      const userData = await response.json();
-      console.log('WordPress user data fetched:', userData);
-      return userData;
-    },
-    enabled: !!wpConfig?.wp_url && !!wpConfig?.wp_token && !!wpConfig?.wp_username,
-    retry: 1,
-    onError: (error) => {
-      console.error('WordPress user data fetch error:', error);
-      toast({
-        title: "Error",
-        description: "No se pudo cargar la información del usuario de WordPress",
-        variant: "destructive",
-      });
-    },
-  });
+  const { data: wpConfig, error: configError } = useWordPressConfig();
+  const { data: wpUserData, isLoading } = useWordPressUser(wpConfig);
 
   if (configError) {
     return (
