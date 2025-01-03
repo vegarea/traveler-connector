@@ -1,6 +1,11 @@
-import React, { useEffect, useRef } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import React from 'react';
+import {
+  ComposableMap,
+  Geographies,
+  Geography,
+  Marker,
+  ZoomableGroup
+} from "react-simple-maps";
 
 const visitedCountries = [
   {
@@ -45,53 +50,53 @@ const visitedCountries = [
   }
 ];
 
+const geoUrl = "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries.json";
+
 const ProfileMap = () => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const markers = useRef<mapboxgl.Marker[]>([]);
-
-  useEffect(() => {
-    if (!mapContainer.current) return;
-
-    // Inicializar el mapa
-    mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHMzcDN2NW0wMWF5MmpvNWR2dWd0ZXJ0In0.Q2nZvVh7TCrUXgAB_0USZA';
-    
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/light-v11',
-      center: [0, 20],
-      zoom: 1.5
-    });
-
-    // Añadir controles de navegación
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-    // Añadir marcadores para cada país visitado
-    visitedCountries.forEach((country) => {
-      const marker = new mapboxgl.Marker({ color: '#ef4444' })
-        .setLngLat(country.coordinates)
-        .setPopup(
-          new mapboxgl.Popup({ offset: 25 })
-            .setHTML(`
-              <h3 class="font-bold">${country.name}</h3>
-              <p class="text-sm text-gray-500">${country.region}</p>
-            `)
-        )
-        .addTo(map.current!);
-      
-      markers.current.push(marker);
-    });
-
-    // Cleanup
-    return () => {
-      markers.current.forEach(marker => marker.remove());
-      map.current?.remove();
-    };
-  }, []);
-
   return (
-    <div className="w-full h-[400px] rounded-lg overflow-hidden">
-      <div ref={mapContainer} className="w-full h-full" />
+    <div className="w-full h-[400px] rounded-lg overflow-hidden bg-card">
+      <ComposableMap
+        projection="geoMercator"
+        projectionConfig={{
+          scale: 150
+        }}
+      >
+        <ZoomableGroup center={[0, 20]} zoom={1}>
+          <Geographies geography={geoUrl}>
+            {({ geographies }) =>
+              geographies.map((geo) => (
+                <Geography
+                  key={geo.rsmKey}
+                  geography={geo}
+                  fill="#374151"
+                  stroke="#6B7280"
+                  strokeWidth={0.5}
+                  style={{
+                    default: {
+                      outline: "none",
+                    },
+                    hover: {
+                      fill: "#4B5563",
+                      outline: "none",
+                    },
+                    pressed: {
+                      fill: "#374151",
+                      outline: "none",
+                    },
+                  }}
+                />
+              ))
+            }
+          </Geographies>
+
+          {visitedCountries.map(({ name, coordinates, region }) => (
+            <Marker key={name} coordinates={coordinates}>
+              <circle r={4} fill="#ef4444" />
+              <title>{`${name} - ${region}`}</title>
+            </Marker>
+          ))}
+        </ZoomableGroup>
+      </ComposableMap>
     </div>
   );
 };
