@@ -9,7 +9,98 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      sync_logs: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          payload: Json
+          source: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          payload: Json
+          source: string
+          status: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          payload?: Json
+          source?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      user_meta: {
+        Row: {
+          id: string
+          meta_key: string
+          meta_value: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          meta_key: string
+          meta_value?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          meta_key?: string
+          meta_value?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_meta_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      users: {
+        Row: {
+          avatar_url: string | null
+          cover_url: string | null
+          created_at: string
+          email: string
+          id: string
+          updated_at: string
+          username: string
+          wordpress_user_id: number
+        }
+        Insert: {
+          avatar_url?: string | null
+          cover_url?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          updated_at?: string
+          username: string
+          wordpress_user_id: number
+        }
+        Update: {
+          avatar_url?: string | null
+          cover_url?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          updated_at?: string
+          username?: string
+          wordpress_user_id?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
