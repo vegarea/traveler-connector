@@ -19,7 +19,6 @@ export const useBuddyBossConfigForm = () => {
     },
   });
 
-  // Cargar configuración existente al montar el componente
   useEffect(() => {
     const loadConfig = async () => {
       const { data, error } = await supabase
