@@ -1,26 +1,19 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Profile from './pages/Profile';
-import MemberProfile from './pages/MemberProfile';
 import Index from './pages/Index';
-import AdminLayout from './components/admin/AdminLayout';
 import Admin from './pages/Admin';
+import MemberProfile from './pages/MemberProfile';
+import { Toaster } from "@/components/ui/toaster";
+import './App.css';
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Index />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/members/:username" element={<MemberProfile />} />
-        <Route 
-          path="/admin" 
-          element={
-            <AdminLayout>
-              <Admin />
-            </AdminLayout>
-          } 
-        />
+        <Route path="/admin/*" element={<Admin />} />
+        <Route path="/u/:username" element={<MemberProfile />} />
       </Routes>
+      <Toaster />
     </Router>
   );
 }
