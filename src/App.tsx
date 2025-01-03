@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Profile from './pages/Profile';
 import MemberProfile from './pages/MemberProfile';
 import Index from './pages/Index';
-import AdminLayout from './pages/AdminLayout';
+import AdminLayout from './components/admin/AdminLayout';
 
 function App() {
   return (
