@@ -12,38 +12,39 @@ const ProfileMap = () => {
     if (!mapContainer.current) return;
 
     try {
-      // Initialize map
-      mapboxgl.accessToken = MAPBOX_TOKEN;
-      
-      const mapInstance = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/light-v11',
-        projection: 'globe',
-        zoom: 1.5,
-        center: [30, 15],
-        pitch: 45,
-      });
+      // Initialize map only if it hasn't been initialized
+      if (!map.current) {
+        mapboxgl.accessToken = MAPBOX_TOKEN;
+        
+        const mapInstance = new mapboxgl.Map({
+          container: mapContainer.current,
+          style: 'mapbox://styles/mapbox/light-v11',
+          projection: 'globe',
+          zoom: 1.5,
+          center: [30, 15],
+          pitch: 45,
+        });
 
-      map.current = mapInstance;
+        map.current = mapInstance;
 
-      // Add navigation controls
-      mapInstance.addControl(
-        new mapboxgl.NavigationControl({
-          visualizePitch: true,
-        }),
-        'top-right'
-      );
+        // Add navigation controls
+        mapInstance.addControl(
+          new mapboxgl.NavigationControl({
+            visualizePitch: true,
+          }),
+          'top-right'
+        );
 
-      // Handle map load errors
-      mapInstance.on('error', (e) => {
-        console.error('Mapbox error:', e);
-      });
-
+        // Handle map load errors
+        mapInstance.on('error', (e) => {
+          console.error('Mapbox error:', e);
+        });
+      }
     } catch (error) {
       console.error('Error initializing map:', error);
     }
 
-    // Cleanup
+    // Cleanup function
     return () => {
       if (map.current) {
         map.current.remove();
