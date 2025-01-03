@@ -3,11 +3,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { configSchema, ConfigFormValues } from './types';
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 export const useConfigForm = () => {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   
   const form = useForm<ConfigFormValues>({
     resolver: zodResolver(configSchema),
@@ -20,10 +19,9 @@ export const useConfigForm = () => {
     },
   });
 
-  // Cargar configuración existente usando React Query
-  const { data: config } = useQuery({
-    queryKey: ['wordpress-config'],
-    queryFn: async () => {
+  // Cargar configuración existente al montar el componente
+  useEffect(() => {
+    const loadConfig = async () => {
       const { data, error } = await supabase
         .from('wordpress_config')
         .select('*')
@@ -31,25 +29,22 @@ export const useConfigForm = () => {
 
       if (error) {
         console.error('Error loading WordPress config:', error);
-        return null;
+        return;
       }
 
-      return data;
-    },
-  });
+      if (data) {
+        form.reset({
+          wp_url: data.wp_url,
+          wp_username: data.wp_username,
+          wp_token: data.wp_token,
+          sync_users: data.sync_users || false,
+          sync_interval: data.sync_interval || 15,
+        });
+      }
+    };
 
-  // Actualizar el formulario cuando se cargan los datos
-  React.useEffect(() => {
-    if (config) {
-      form.reset({
-        wp_url: config.wp_url,
-        wp_username: config.wp_username,
-        wp_token: config.wp_token,
-        sync_users: config.sync_users || false,
-        sync_interval: config.sync_interval || 15,
-      });
-    }
-  }, [config, form]);
+    loadConfig();
+  }, [form]);
 
   const testConnection = async (values: ConfigFormValues) => {
     try {
@@ -94,14 +89,21 @@ export const useConfigForm = () => {
     }
   };
 
-  // Usar React Query mutation para guardar la configuración
-  const mutation = useMutation({
-    mutationFn: async (values: ConfigFormValues) => {
+  const onSubmit = async (values: ConfigFormValues) => {
+    try {
+      // Eliminar espacios en blanco del token antes de guardar
       const cleanValues = {
         ...values,
         wp_token: values.wp_token.replace(/\s+/g, '')
       };
       
+      // Primero probar la conexión
+      const isConnected = await testConnection(cleanValues);
+      
+      if (!isConnected) {
+        return;
+      }
+
       const { error } = await supabase
         .from('wordpress_config')
         .upsert({
@@ -112,17 +114,16 @@ export const useConfigForm = () => {
           sync_interval: cleanValues.sync_interval,
         });
 
-      if (error) throw error;
-      return cleanValues;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['wordpress-config'] });
+      if (error) {
+        console.error('Error saving WordPress config:', error);
+        throw error;
+      }
+
       toast({
         title: "Configuración guardada",
         description: "Los cambios han sido guardados correctamente.",
       });
-    },
-    onError: (error) => {
+    } catch (error) {
       console.error('Error saving WordPress config:', error);
       toast({
         title: "Error",
@@ -130,18 +131,6 @@ export const useConfigForm = () => {
         variant: "destructive",
       });
     }
-  });
-
-  const onSubmit = async (values: ConfigFormValues) => {
-    // Primero probar la conexión
-    const isConnected = await testConnection(values);
-    
-    if (!isConnected) {
-      return;
-    }
-
-    // Si la conexión es exitosa, guardar la configuración
-    mutation.mutate(values);
   };
 
   return {
