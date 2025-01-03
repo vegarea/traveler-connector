@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
+const MAPBOX_TOKEN = 'pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHMzcDN2NW0wMWF5MmpvNWR2dWd0ZXJ0In0.Q2nZvVh7TCrUXgAB_0USZA';
+
 const ProfileMap = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -9,29 +11,44 @@ const ProfileMap = () => {
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    // Initialize map
-    mapboxgl.accessToken = 'YOUR_MAPBOX_TOKEN'; // You'll need to replace this with your Mapbox token
-    
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/light-v11',
-      projection: 'globe',
-      zoom: 1.5,
-      center: [30, 15],
-      pitch: 45,
-    });
+    try {
+      // Initialize map
+      mapboxgl.accessToken = MAPBOX_TOKEN;
+      
+      const mapInstance = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/light-v11',
+        projection: 'globe',
+        zoom: 1.5,
+        center: [30, 15],
+        pitch: 45,
+      });
 
-    // Add navigation controls
-    map.current.addControl(
-      new mapboxgl.NavigationControl({
-        visualizePitch: true,
-      }),
-      'top-right'
-    );
+      map.current = mapInstance;
+
+      // Add navigation controls
+      mapInstance.addControl(
+        new mapboxgl.NavigationControl({
+          visualizePitch: true,
+        }),
+        'top-right'
+      );
+
+      // Handle map load errors
+      mapInstance.on('error', (e) => {
+        console.error('Mapbox error:', e);
+      });
+
+    } catch (error) {
+      console.error('Error initializing map:', error);
+    }
 
     // Cleanup
     return () => {
-      map.current?.remove();
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
     };
   }, []);
 
