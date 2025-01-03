@@ -2,7 +2,7 @@ import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { WordPressConfigForm } from "@/components/admin/WordPressConfigForm";
-import { ConnectionStatus } from "@/components/admin/ConnectionStatus";
+import { PermissionsCheck } from "@/components/admin/permissions/PermissionsCheck";
 import { SyncDashboard } from "@/components/admin/sync/SyncDashboard";
 
 const Admin = () => {
@@ -24,7 +24,7 @@ const Admin = () => {
 
           <TabsContent value="permissions">
             <div className="space-y-6">
-              <ConnectionStatus />
+              <PermissionsCheck />
             </div>
           </TabsContent>
 
