@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import AdminLayout from "@/components/admin/AdminLayout";
 
 const Admin = () => {
   const { toast } = useToast();
@@ -18,13 +19,13 @@ const Admin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <AdminLayout>
       <div className="max-w-4xl mx-auto space-y-6">
-        <h1 className="text-3xl font-bold">Panel de Administración</h1>
+        <h1 className="text-3xl font-bold">Configuración de WordPress</h1>
         
         <Card>
           <CardHeader>
-            <CardTitle>Configuración de WordPress</CardTitle>
+            <CardTitle>Conexión con WordPress</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSaveConfig} className="space-y-6">
@@ -104,7 +105,7 @@ const Admin = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 
