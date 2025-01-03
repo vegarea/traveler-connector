@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,11 +17,14 @@ const Profile = () => {
   const { data: wpConfig } = useQuery({
     queryKey: ['wordpress-config'],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('wordpress_config')
         .select('*')
-        .single();
-      return data;
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (error) throw error;
+      return data?.[0] || null;
     },
   });
 
