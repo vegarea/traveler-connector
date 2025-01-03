@@ -1,67 +1,12 @@
 import React from 'react';
-import { useForm } from "react-hook-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { Switch } from "@/components/ui/switch";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { supabase } from "@/integrations/supabase/client";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-
-// Define the schema to match Supabase's requirements
-const configSchema = z.object({
-  wp_url: z.string().url("Please enter a valid URL"),
-  wp_token: z.string().min(1, "API Key is required"),
-  sync_users: z.boolean().default(false),
-  sync_interval: z.number().min(5).default(15),
-});
-
-// Derive the type from the schema
-type ConfigFormValues = z.infer<typeof configSchema>;
+import { Form } from "@/components/ui/form";
+import { ConfigFormFields } from './forms/ConfigFormFields';
+import { useConfigForm } from './forms/useConfigForm';
 
 export const WordPressConfigForm = () => {
-  const { toast } = useToast();
-  const form = useForm<ConfigFormValues>({
-    resolver: zodResolver(configSchema),
-    defaultValues: {
-      wp_url: "",
-      wp_token: "",
-      sync_users: false,
-      sync_interval: 15,
-    },
-  });
-
-  const onSubmit = async (values: ConfigFormValues) => {
-    try {
-      const { error } = await supabase
-        .from('wordpress_config')
-        .insert({
-          wp_url: values.wp_url,
-          wp_token: values.wp_token,
-          sync_users: values.sync_users,
-          sync_interval: values.sync_interval,
-        });
-
-      if (error) {
-        console.error('Error saving WordPress config:', error);
-        throw error;
-      }
-
-      toast({
-        title: "Configuración guardada",
-        description: "Los cambios han sido guardados correctamente.",
-      });
-    } catch (error) {
-      console.error('Error saving WordPress config:', error);
-      toast({
-        title: "Error",
-        description: "No se pudo guardar la configuración.",
-        variant: "destructive",
-      });
-    }
-  };
+  const { form, onSubmit } = useConfigForm();
 
   return (
     <Card>
@@ -71,69 +16,7 @@ export const WordPressConfigForm = () => {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="wp_url"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>URL de WordPress</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://tuwordpress.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="wp_token"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>API Key</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="wp_xxxxx..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="sync_users"
-              render={({ field }) => (
-                <FormItem className="flex items-center space-x-2">
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormLabel>Sincronización automática de usuarios</FormLabel>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="sync_interval"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Intervalo de sincronización (minutos)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min="5"
-                      {...field}
-                      onChange={e => field.onChange(Number(e.target.value))}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
+            <ConfigFormFields form={form} />
             <Button type="submit" className="w-full">
               Guardar configuración
             </Button>
