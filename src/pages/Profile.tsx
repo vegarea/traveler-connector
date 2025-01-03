@@ -2,11 +2,12 @@ import React from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Users, Flag, Star, Trophy, Plane } from "lucide-react";
+import { MapPin, Users, Flag, Star, Trophy, Plane, UsersRound } from "lucide-react";
 import ProfileMap from '@/components/ProfileMap';
 import ProfileStats from '@/components/ProfileStats';
 import TravelBadges from '@/components/TravelBadges';
 import PublishedTrips from '@/components/PublishedTrips';
+import TravelGroups from '@/components/TravelGroups';
 
 const Profile = () => {
   return (
@@ -105,6 +106,15 @@ const Profile = () => {
                 <TravelBadges />
               </CardContent>
             </Card>
+          </div>
+
+          {/* Travel Groups */}
+          <div className="mt-8">
+            <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
+              <UsersRound className="w-6 h-6" />
+              Grupos de Viaje
+            </h2>
+            <TravelGroups />
           </div>
 
           {/* Published Trips */}
