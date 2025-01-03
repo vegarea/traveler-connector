@@ -1,11 +1,13 @@
 import React from 'react';
-import { SyncStatsCard } from './SyncStatsCard';
-import { SyncLogsList } from './SyncLogsList';
+import { SyncStats } from "../SyncStats";
+import { SyncLogsList } from "./SyncLogsList";
+import { UserMetaList } from "../UserMetaList";
 
 export const SyncDashboard = () => {
   return (
     <div className="space-y-6">
-      <SyncStatsCard />
+      <SyncStats />
+      <UserMetaList />
       <SyncLogsList />
     </div>
   );
