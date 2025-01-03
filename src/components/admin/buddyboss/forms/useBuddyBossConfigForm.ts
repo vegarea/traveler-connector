@@ -26,21 +26,21 @@ export const useBuddyBossConfigForm = () => {
         .from('buddypress_config')
         .select('*')
         .order('created_at', { ascending: false })
-        .limit(1);
+        .limit(1)
+        .single();
 
       if (error) {
         console.error('Error loading BuddyBoss config:', error);
         return;
       }
 
-      if (data && data.length > 0) {
-        const config = data[0];
+      if (data) {
         form.reset({
-          sync_xprofile: config.sync_xprofile_fields,
-          sync_groups: config.sync_groups,
-          sync_activity: config.sync_activity,
-          sync_friends: config.sync_friends,
-          sync_interval: config.sync_interval,
+          sync_xprofile: data.sync_xprofile_fields,
+          sync_groups: data.sync_groups,
+          sync_activity: data.sync_activity,
+          sync_friends: data.sync_friends,
+          sync_interval: data.sync_interval,
         });
       }
     };
