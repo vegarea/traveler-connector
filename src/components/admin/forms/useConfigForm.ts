@@ -25,20 +25,22 @@ export const useConfigForm = () => {
       const { data, error } = await supabase
         .from('wordpress_config')
         .select('*')
-        .single();
+        .order('created_at', { ascending: false })
+        .limit(1);
 
       if (error) {
         console.error('Error loading WordPress config:', error);
         return;
       }
 
-      if (data) {
+      if (data && data.length > 0) {
+        const config = data[0];
         form.reset({
-          wp_url: data.wp_url,
-          wp_username: data.wp_username,
-          wp_token: data.wp_token,
-          sync_users: data.sync_users || false,
-          sync_interval: data.sync_interval || 15,
+          wp_url: config.wp_url,
+          wp_username: config.wp_username,
+          wp_token: config.wp_token,
+          sync_users: config.sync_users || false,
+          sync_interval: config.sync_interval || 15,
         });
       }
     };
