@@ -46,14 +46,23 @@ export const useConfigForm = () => {
 
   const testConnection = async (values: ConfigFormValues) => {
     try {
+      // First try to get the nonce
+      const baseResponse = await fetch(`${values.wp_url}/wp-json`);
+      if (!baseResponse.ok) {
+        throw new Error('No se pudo conectar con WordPress');
+      }
+
+      // Then try to authenticate
       const response = await fetch(`${values.wp_url}/wp-json/wp/v2/users/me`, {
         headers: {
-          'Authorization': `Bearer ${values.wp_token}`,
+          'Authorization': `Basic ${btoa(`:${values.wp_token}`)}`,
+          'Content-Type': 'application/json',
         },
       });
 
       if (!response.ok) {
-        throw new Error('Error de conexión con WordPress');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error de conexión con WordPress');
       }
 
       const data = await response.json();
@@ -68,7 +77,7 @@ export const useConfigForm = () => {
       console.error('Error testing WordPress connection:', error);
       toast({
         title: "Error de conexión",
-        description: "No se pudo conectar con WordPress. Verifica la URL y el token.",
+        description: "No se pudo conectar con WordPress. Verifica la URL y el token de aplicación.",
         variant: "destructive",
       });
       return false;
