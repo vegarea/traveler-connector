@@ -9,39 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      buddypress_config: {
-        Row: {
-          created_at: string
-          id: string
-          sync_activity: boolean | null
-          sync_friends: boolean | null
-          sync_groups: boolean | null
-          sync_interval: number | null
-          sync_xprofile_fields: boolean | null
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          sync_activity?: boolean | null
-          sync_friends?: boolean | null
-          sync_groups?: boolean | null
-          sync_interval?: number | null
-          sync_xprofile_fields?: boolean | null
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          sync_activity?: boolean | null
-          sync_friends?: boolean | null
-          sync_groups?: boolean | null
-          sync_interval?: number | null
-          sync_xprofile_fields?: boolean | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
       sync_logs: {
         Row: {
           created_at: string

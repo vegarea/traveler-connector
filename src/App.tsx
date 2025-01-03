@@ -1,15 +1,19 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Index from './pages/Index';
 import Admin from './pages/Admin';
-import BuddyBossLayout from './components/admin/buddyboss/BuddyBossLayout';
+import MemberProfile from './pages/MemberProfile';
+import { Toaster } from "@/components/ui/toaster";
+import './App.css';
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/admin/buddyboss/*" element={<BuddyBossLayout />} />
+        <Route path="/" element={<Index />} />
+        <Route path="/admin/*" element={<Admin />} />
+        <Route path="/u/:username" element={<MemberProfile />} />
       </Routes>
+      <Toaster />
     </Router>
   );
 }
