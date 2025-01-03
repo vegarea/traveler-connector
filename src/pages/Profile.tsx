@@ -34,7 +34,7 @@ const Profile: React.FC<ProfileProps> = ({ userId }) => {
         .from('users')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -71,6 +71,10 @@ const Profile: React.FC<ProfileProps> = ({ userId }) => {
     ? `${wpConfig?.wp_url}/members/${userData?.username}`
     : wpUserData?.link;
 
+  // Obtener la URL del avatar correcta
+  const avatarUrl = displayData?.avatar_url || (wpUserData?.avatar_urls && wpUserData.avatar_urls['96']);
+  const username = displayData?.username || 'Usuario';
+
   return (
     <div className="min-h-screen bg-background">
       {/* Cover Photo */}
@@ -89,12 +93,12 @@ const Profile: React.FC<ProfileProps> = ({ userId }) => {
           {/* Avatar and Basic Info */}
           <div className="flex flex-col items-center">
             <Avatar className="w-32 h-32 border-4 border-background">
-              <AvatarImage src={displayData?.avatar_url || ''} />
+              <AvatarImage src={avatarUrl} alt={username} />
               <AvatarFallback>
-                {displayData?.username ? displayData.username.charAt(0).toUpperCase() : 'U'}
+                {username.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            <h1 className="mt-4 text-3xl font-bold">{displayData?.username || 'Usuario'}</h1>
+            <h1 className="mt-4 text-3xl font-bold">{username}</h1>
             <p className="mt-2 text-muted-foreground text-center max-w-2xl">
               {displayData?.description || 'Sin descripción'}
             </p>
