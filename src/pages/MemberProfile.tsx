@@ -19,7 +19,7 @@ const MemberProfile = () => {
         .from('users')
         .select('*')
         .eq('username', username)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching user:', error);
