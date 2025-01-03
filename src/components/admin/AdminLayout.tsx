@@ -13,7 +13,7 @@ import {
   SidebarGroupLabel,
   SidebarProvider,
 } from "@/components/ui/sidebar";
-import { Settings, Users, LogOut } from "lucide-react";
+import { Settings, LogOut } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const menuItems = [
@@ -21,7 +21,6 @@ const menuItems = [
     group: "WordPress",
     items: [
       { title: "Panel de Control", icon: Settings, path: "/admin" },
-      { title: "BuddyBoss", icon: Users, path: "/admin/buddyboss" },
     ]
   }
 ];
