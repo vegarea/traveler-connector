@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+// Define the schema to match Supabase's requirements
 const configSchema = z.object({
   wp_url: z.string().url("Please enter a valid URL"),
   wp_token: z.string().min(1, "API Key is required"),
@@ -18,6 +19,7 @@ const configSchema = z.object({
   sync_interval: z.number().min(5).default(15),
 });
 
+// Derive the type from the schema
 type ConfigFormValues = z.infer<typeof configSchema>;
 
 export const WordPressConfigForm = () => {
@@ -32,12 +34,16 @@ export const WordPressConfigForm = () => {
     },
   });
 
-  const onSubmit = async (data: ConfigFormValues) => {
+  const onSubmit = async (values: ConfigFormValues) => {
     try {
-      // Insertar directamente el objeto data, no dentro de un array
       const { error } = await supabase
         .from('wordpress_config')
-        .insert(data);
+        .insert({
+          wp_url: values.wp_url,
+          wp_token: values.wp_token,
+          sync_users: values.sync_users,
+          sync_interval: values.sync_interval,
+        });
 
       if (error) throw error;
 
