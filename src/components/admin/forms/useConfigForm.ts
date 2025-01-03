@@ -12,6 +12,7 @@ export const useConfigForm = () => {
     resolver: zodResolver(configSchema),
     defaultValues: {
       wp_url: "",
+      wp_username: "",
       wp_token: "",
       sync_users: false,
       sync_interval: 15,
@@ -34,6 +35,7 @@ export const useConfigForm = () => {
       if (data) {
         form.reset({
           wp_url: data.wp_url,
+          wp_username: data.wp_username,
           wp_token: data.wp_token,
           sync_users: data.sync_users || false,
           sync_interval: data.sync_interval || 15,
@@ -55,10 +57,10 @@ export const useConfigForm = () => {
         throw new Error('No se pudo conectar con WordPress');
       }
 
-      // Then try to authenticate
+      // Then try to authenticate with username:password
       const response = await fetch(`${values.wp_url}/wp-json/wp/v2/users/me`, {
         headers: {
-          'Authorization': `Basic ${btoa(`:${cleanToken}`)}`,
+          'Authorization': `Basic ${btoa(`${values.wp_username}:${cleanToken}`)}`,
           'Content-Type': 'application/json',
         },
       });
@@ -80,7 +82,7 @@ export const useConfigForm = () => {
       console.error('Error testing WordPress connection:', error);
       toast({
         title: "Error de conexión",
-        description: "No se pudo conectar con WordPress. Verifica la URL y el token de aplicación.",
+        description: "No se pudo conectar con WordPress. Verifica el usuario y el token de aplicación.",
         variant: "destructive",
       });
       return false;
@@ -106,6 +108,7 @@ export const useConfigForm = () => {
         .from('wordpress_config')
         .upsert({
           wp_url: cleanValues.wp_url,
+          wp_username: cleanValues.wp_username,
           wp_token: cleanValues.wp_token,
           sync_users: cleanValues.sync_users,
           sync_interval: cleanValues.sync_interval,

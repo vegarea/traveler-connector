@@ -28,6 +28,20 @@ export const ConfigFormFields = ({ form }: ConfigFormFieldsProps) => {
 
       <FormField
         control={form.control}
+        name="wp_username"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Nombre de usuario de WordPress</FormLabel>
+            <FormControl>
+              <Input placeholder="admin" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
         name="wp_token"
         render={({ field }) => (
           <FormItem>
