@@ -1,10 +1,11 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
-import { Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useWordPressConfig } from './hooks/useWordPressConfig';
+import { PermissionItem } from './components/PermissionItem';
 
 interface Permission {
   endpoint: string;
@@ -62,26 +63,9 @@ const checkEndpoint = async (endpoint: string, wpUrl: string, wpToken: string) =
 
 export const PermissionsCheck = () => {
   const { toast } = useToast();
+  const { data: wpConfig, error: configError } = useWordPressConfig();
 
-  const { data: wpConfig, error: configError } = useQuery({
-    queryKey: ['wordpress-config'],
-    queryFn: async () => {
-      try {
-        const { data, error } = await fetch('/api/wordpress/config').then(res => res.json());
-        if (error) {
-          console.error('Error al cargar la configuración de WordPress:', error);
-          throw error;
-        }
-        console.log('Configuración de WordPress cargada:', data);
-        return data;
-      } catch (error) {
-        console.error('Error en la consulta de configuración:', error);
-        throw error;
-      }
-    }
-  });
-
-  const { data: permissions, isLoading: permissionsLoading, refetch, error: permissionsError } = useQuery({
+  const { data: permissions, isLoading: permissionsLoading, refetch } = useQuery({
     queryKey: ['wordpress-permissions', wpConfig],
     queryFn: async () => {
       if (!wpConfig?.wp_url || !wpConfig?.wp_token) {
@@ -112,7 +96,7 @@ export const PermissionsCheck = () => {
     retry: false
   });
 
-  const { data: userStructure, isLoading: userStructureLoading, error: userStructureError } = useQuery({
+  const { data: userStructure, isLoading: userStructureLoading } = useQuery({
     queryKey: ['wordpress-user-structure', wpConfig],
     queryFn: async () => {
       if (!wpConfig?.wp_url || !wpConfig?.wp_token) {
@@ -157,13 +141,6 @@ export const PermissionsCheck = () => {
     });
   };
 
-  // Si hay errores, mostrarlos en la consola
-  React.useEffect(() => {
-    if (configError) console.error('Error en la configuración:', configError);
-    if (permissionsError) console.error('Error en los permisos:', permissionsError);
-    if (userStructureError) console.error('Error en la estructura de usuario:', userStructureError);
-  }, [configError, permissionsError, userStructureError]);
-
   return (
     <Card>
       <CardHeader>
@@ -203,32 +180,20 @@ export const PermissionsCheck = () => {
               ) : permissions ? (
                 <div className="space-y-4">
                   {permissions.map((permission) => (
-                    <div
+                    <PermissionItem
                       key={permission.endpoint}
-                      className="flex items-center justify-between p-2 rounded-lg bg-muted"
-                    >
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium">{permission.description}</p>
-                        <code className="text-xs text-muted-foreground">
-                          {permission.endpoint}
-                        </code>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {permission.isAvailable ? (
-                          <CheckCircle2 className="h-5 w-5 text-green-500" />
-                        ) : (
-                          <XCircle className="h-5 w-5 text-red-500" />
-                        )}
-                      </div>
-                    </div>
+                      endpoint={permission.endpoint}
+                      description={permission.description}
+                      isAvailable={permission.isAvailable}
+                    />
                   ))}
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground py-4">
                   No se pudo verificar los permisos. Asegúrate de que WordPress esté correctamente configurado.
-                  {permissionsError && (
+                  {configError && (
                     <span className="block mt-2 text-red-500">
-                      Error: {permissionsError.message}
+                      Error: {configError.message}
                     </span>
                   )}
                 </p>
@@ -253,11 +218,6 @@ export const PermissionsCheck = () => {
               ) : (
                 <p className="text-sm text-muted-foreground py-4">
                   No se pudo obtener la estructura del usuario. Verifica la conexión con WordPress.
-                  {userStructureError && (
-                    <span className="block mt-2 text-red-500">
-                      Error: {userStructureError.message}
-                    </span>
-                  )}
                 </p>
               )}
             </div>
