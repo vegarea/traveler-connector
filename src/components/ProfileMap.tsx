@@ -50,8 +50,8 @@ const visitedCountries = [
   }
 ];
 
-// Cambiamos la URL al repositorio de Natural Earth Data, que es una fuente confiable y mantenida
-const geoUrl = "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
+// Using a reliable source for the world map data
+const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 const ProfileMap = () => {
   return (
