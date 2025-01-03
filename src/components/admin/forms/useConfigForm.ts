@@ -46,6 +46,9 @@ export const useConfigForm = () => {
 
   const testConnection = async (values: ConfigFormValues) => {
     try {
+      // Eliminar espacios en blanco del token
+      const cleanToken = values.wp_token.replace(/\s+/g, '');
+      
       // First try to get the nonce
       const baseResponse = await fetch(`${values.wp_url}/wp-json`);
       if (!baseResponse.ok) {
@@ -55,7 +58,7 @@ export const useConfigForm = () => {
       // Then try to authenticate
       const response = await fetch(`${values.wp_url}/wp-json/wp/v2/users/me`, {
         headers: {
-          'Authorization': `Basic ${btoa(`:${values.wp_token}`)}`,
+          'Authorization': `Basic ${btoa(`:${cleanToken}`)}`,
           'Content-Type': 'application/json',
         },
       });
@@ -86,8 +89,14 @@ export const useConfigForm = () => {
 
   const onSubmit = async (values: ConfigFormValues) => {
     try {
+      // Eliminar espacios en blanco del token antes de guardar
+      const cleanValues = {
+        ...values,
+        wp_token: values.wp_token.replace(/\s+/g, '')
+      };
+      
       // Primero probar la conexión
-      const isConnected = await testConnection(values);
+      const isConnected = await testConnection(cleanValues);
       
       if (!isConnected) {
         return;
@@ -96,10 +105,10 @@ export const useConfigForm = () => {
       const { error } = await supabase
         .from('wordpress_config')
         .upsert({
-          wp_url: values.wp_url,
-          wp_token: values.wp_token,
-          sync_users: values.sync_users,
-          sync_interval: values.sync_interval,
+          wp_url: cleanValues.wp_url,
+          wp_token: cleanValues.wp_token,
+          sync_users: cleanValues.sync_users,
+          sync_interval: cleanValues.sync_interval,
         });
 
       if (error) {
