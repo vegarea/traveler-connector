@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { supabase } from "@/integrations/supabase/client";
@@ -45,7 +44,10 @@ export const WordPressConfigForm = () => {
           sync_interval: values.sync_interval,
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error saving WordPress config:', error);
+        throw error;
+      }
 
       toast({
         title: "Configuración guardada",
