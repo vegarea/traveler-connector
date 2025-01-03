@@ -26,7 +26,7 @@ export const useBuddyBossConfigForm = () => {
         .select('*')
         .order('created_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error loading BuddyBoss config:', error);
@@ -52,7 +52,7 @@ export const useBuddyBossConfigForm = () => {
       const wpConfig = await supabase
         .from('wordpress_config')
         .select('wp_url')
-        .single();
+        .maybeSingle();
 
       if (!wpConfig.data?.wp_url) {
         throw new Error('No se ha configurado la URL de WordPress');
