@@ -6,7 +6,7 @@ import { ConfigFormFields } from './forms/ConfigFormFields';
 import { useConfigForm } from './forms/useConfigForm';
 
 export const WordPressConfigForm = () => {
-  const { form, onSubmit } = useConfigForm();
+  const { form, onSubmit, testConnection } = useConfigForm();
 
   return (
     <Card>
@@ -17,9 +17,19 @@ export const WordPressConfigForm = () => {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <ConfigFormFields form={form} />
-            <Button type="submit" className="w-full">
-              Guardar configuración
-            </Button>
+            <div className="flex gap-4">
+              <Button 
+                type="button" 
+                variant="outline"
+                onClick={() => testConnection()}
+                className="flex-1"
+              >
+                Probar conexión
+              </Button>
+              <Button type="submit" className="flex-1">
+                Guardar configuración
+              </Button>
+            </div>
           </form>
         </Form>
       </CardContent>
