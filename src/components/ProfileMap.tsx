@@ -1,61 +1,68 @@
-import React, { useEffect, useRef } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import React from 'react';
+import { Card } from "@/components/ui/card";
+import { Check } from "lucide-react";
 
-const MAPBOX_TOKEN = 'pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHMzcDN2NW0wMWF5MmpvNWR2dWd0ZXJ0In0.Q2nZvVh7TCrUXgAB_0USZA';
+const visitedCountries = [
+  {
+    name: "Spain",
+    region: "Europe",
+    visited: true,
+  },
+  {
+    name: "France",
+    region: "Europe",
+    visited: true,
+  },
+  {
+    name: "Italy",
+    region: "Europe",
+    visited: true,
+  },
+  {
+    name: "Japan",
+    region: "Asia",
+    visited: true,
+  },
+  {
+    name: "Thailand",
+    region: "Asia",
+    visited: true,
+  },
+  {
+    name: "Brazil",
+    region: "South America",
+    visited: true,
+  },
+  {
+    name: "Morocco",
+    region: "Africa",
+    visited: true,
+  },
+  {
+    name: "Australia",
+    region: "Oceania",
+    visited: true,
+  },
+];
 
 const ProfileMap = () => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-
-  useEffect(() => {
-    if (!mapContainer.current) return;
-
-    try {
-      // Initialize map only if it hasn't been initialized
-      if (!map.current) {
-        mapboxgl.accessToken = MAPBOX_TOKEN;
-        
-        const mapInstance = new mapboxgl.Map({
-          container: mapContainer.current,
-          style: 'mapbox://styles/mapbox/light-v11',
-          projection: 'globe',
-          zoom: 1.5,
-          center: [30, 15],
-          pitch: 45,
-        });
-
-        map.current = mapInstance;
-
-        // Add navigation controls
-        mapInstance.addControl(
-          new mapboxgl.NavigationControl({
-            visualizePitch: true,
-          }),
-          'top-right'
-        );
-
-        // Handle map load errors
-        mapInstance.on('error', (e) => {
-          console.error('Mapbox error:', e);
-        });
-      }
-    } catch (error) {
-      console.error('Error initializing map:', error);
-    }
-
-    // Cleanup function
-    return () => {
-      if (map.current) {
-        map.current.remove();
-        map.current = null;
-      }
-    };
-  }, []);
-
   return (
-    <div className="relative w-full h-full">
-      <div ref={mapContainer} className="absolute inset-0 rounded-lg" />
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {visitedCountries.map((country) => (
+        <Card key={country.name} className="p-4 relative">
+          <div className="absolute top-2 right-2">
+            {country.visited && (
+              <div className="bg-primary rounded-full p-1">
+                <Check className="w-3 h-3 text-primary-foreground" />
+              </div>
+            )}
+          </div>
+          <div className="space-y-1">
+            <h3 className="font-medium">{country.name}</h3>
+            <p className="text-sm text-muted-foreground">{country.region}</p>
+          </div>
+        </Card>
+      ))}
     </div>
   );
 };
