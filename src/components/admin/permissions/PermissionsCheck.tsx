@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useWordPressConfig } from './hooks/useWordPressConfig';
 import { PermissionItem } from './components/PermissionItem';
+import { useQuery } from '@tanstack/react-query';
 
 interface Permission {
   endpoint: string;
