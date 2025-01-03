@@ -34,9 +34,10 @@ export const WordPressConfigForm = () => {
 
   const onSubmit = async (data: ConfigFormValues) => {
     try {
+      // Insertar directamente el objeto data, no dentro de un array
       const { error } = await supabase
         .from('wordpress_config')
-        .insert([data]);
+        .insert(data);
 
       if (error) throw error;
 
@@ -45,6 +46,7 @@ export const WordPressConfigForm = () => {
         description: "Los cambios han sido guardados correctamente.",
       });
     } catch (error) {
+      console.error('Error saving WordPress config:', error);
       toast({
         title: "Error",
         description: "No se pudo guardar la configuración.",
