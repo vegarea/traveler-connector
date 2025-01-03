@@ -50,7 +50,8 @@ const visitedCountries = [
   }
 ];
 
-const geoUrl = "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries.json";
+// Cambiamos la URL al repositorio de Natural Earth Data, que es una fuente confiable y mantenida
+const geoUrl = "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
 
 const ProfileMap = () => {
   return (
