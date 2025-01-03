@@ -131,6 +131,7 @@ export type Database = {
           updated_at: string
           wp_token: string
           wp_url: string
+          wp_username: string
         }
         Insert: {
           created_at?: string
@@ -140,6 +141,7 @@ export type Database = {
           updated_at?: string
           wp_token: string
           wp_url: string
+          wp_username: string
         }
         Update: {
           created_at?: string
@@ -149,6 +151,7 @@ export type Database = {
           updated_at?: string
           wp_token?: string
           wp_url?: string
+          wp_username?: string
         }
         Relationships: []
       }
