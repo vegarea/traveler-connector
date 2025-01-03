@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { WordPressConfigForm } from "@/components/admin/WordPressConfigForm";
 import { ConnectionStatus } from "@/components/admin/ConnectionStatus";
-import { SyncStats } from "@/components/admin/SyncStats";
+import { SyncDashboard } from "@/components/admin/sync/SyncDashboard";
 
 const Admin = () => {
   return (
@@ -29,7 +29,7 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="sync">
-            <SyncStats />
+            <SyncDashboard />
           </TabsContent>
         </Tabs>
       </div>
