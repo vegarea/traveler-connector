@@ -18,14 +18,14 @@ const fetchSyncStats = async () => {
     .select('created_at')
     .order('created_at', { ascending: false })
     .limit(1)
-    .single();
+    .maybeSingle();
 
   if (totalError || successError || latestError) throw new Error('Error fetching stats');
 
   return {
     total: total?.length || 0,
     successful: successful?.length || 0,
-    latestSync: latest?.created_at,
+    latestSync: latest?.created_at || null,
   };
 };
 
@@ -42,7 +42,7 @@ export const SyncStatsCard = () => {
 
   const timeSinceLastSync = stats?.latestSync
     ? Math.round((Date.now() - new Date(stats.latestSync).getTime()) / 60000)
-    : 0;
+    : '-';
 
   return (
     <Card>
@@ -59,7 +59,7 @@ export const SyncStatsCard = () => {
           </div>
           <div className="p-4 bg-muted rounded-lg text-center">
             <div className="text-2xl font-bold">
-              {timeSinceLastSync} min
+              {timeSinceLastSync === '-' ? '-' : `${timeSinceLastSync} min`}
             </div>
             <div className="text-sm text-muted-foreground">
               Última sincronización
