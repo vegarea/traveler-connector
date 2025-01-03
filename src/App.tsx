@@ -3,6 +3,7 @@ import Profile from './pages/Profile';
 import MemberProfile from './pages/MemberProfile';
 import Index from './pages/Index';
 import AdminLayout from './components/admin/AdminLayout';
+import Admin from './pages/Admin';
 
 function App() {
   return (
@@ -12,10 +13,10 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/members/:username" element={<MemberProfile />} />
         <Route 
-          path="/admin/*" 
+          path="/admin" 
           element={
             <AdminLayout>
-              {/* Admin routes will be rendered here */}
+              <Admin />
             </AdminLayout>
           } 
         />
