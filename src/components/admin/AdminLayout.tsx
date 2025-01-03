@@ -11,30 +11,19 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar";
 import { Settings, Users, Webhook, Globe, Activity, Shield } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const menuItems = [
   {
     group: "WordPress",
     items: [
-      { title: "Configuración", icon: Settings, path: "/admin" },
-      { title: "Webhooks", icon: Webhook, path: "/admin/webhooks" },
-      { title: "Usuarios", icon: Users, path: "/admin/users" },
-    ]
-  },
-  {
-    group: "BuddyPress",
-    items: [
-      { title: "Actividad", icon: Activity, path: "/admin/activity" },
-      { title: "Grupos", icon: Globe, path: "/admin/groups" },
-      { title: "Permisos", icon: Shield, path: "/admin/permissions" },
+      { title: "Panel de Control", icon: Settings, path: "/admin" },
     ]
   }
 ];
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
-  const location = useLocation();
 
   return (
     <SidebarProvider>
@@ -52,7 +41,6 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
                     <SidebarMenuItem key={item.path}>
                       <SidebarMenuButton
                         onClick={() => navigate(item.path)}
-                        isActive={location.pathname === item.path}
                         tooltip={item.title}
                       >
                         <item.icon className="w-4 h-4" />

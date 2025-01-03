@@ -19,11 +19,6 @@ function App() {
             <Route path="/" element={<Index />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/admin" element={<Admin />} />
-            <Route path="/admin/webhooks" element={<Admin />} />
-            <Route path="/admin/users" element={<Admin />} />
-            <Route path="/admin/activity" element={<Admin />} />
-            <Route path="/admin/groups" element={<Admin />} />
-            <Route path="/admin/permissions" element={<Admin />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
