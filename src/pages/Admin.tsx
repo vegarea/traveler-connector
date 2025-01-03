@@ -5,6 +5,7 @@ import { WordPressConfigForm } from "@/components/admin/WordPressConfigForm";
 import { PermissionsCheck } from "@/components/admin/permissions/PermissionsCheck";
 import { SyncDashboard } from "@/components/admin/sync/SyncDashboard";
 import { WordPressUserProfile } from "@/components/admin/wordpress/WordPressUserProfile";
+import { BuddyBossConfigForm } from "@/components/admin/buddyboss/BuddyBossConfigForm";
 
 const Admin = () => {
   return (
@@ -19,6 +20,7 @@ const Admin = () => {
             <TabsTrigger value="config">Configuración</TabsTrigger>
             <TabsTrigger value="permissions">Permisos</TabsTrigger>
             <TabsTrigger value="sync">Sincronización</TabsTrigger>
+            <TabsTrigger value="buddyboss">BuddyBoss</TabsTrigger>
           </TabsList>
 
           <TabsContent value="config">
@@ -33,6 +35,10 @@ const Admin = () => {
 
           <TabsContent value="sync">
             <SyncDashboard />
+          </TabsContent>
+
+          <TabsContent value="buddyboss">
+            <BuddyBossConfigForm />
           </TabsContent>
         </Tabs>
       </div>
