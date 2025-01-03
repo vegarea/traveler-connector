@@ -101,6 +101,36 @@ export type Database = {
         }
         Relationships: []
       }
+      wordpress_config: {
+        Row: {
+          created_at: string
+          id: string
+          sync_interval: number | null
+          sync_users: boolean | null
+          updated_at: string
+          wp_token: string
+          wp_url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          sync_interval?: number | null
+          sync_users?: boolean | null
+          updated_at?: string
+          wp_token: string
+          wp_url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          sync_interval?: number | null
+          sync_users?: boolean | null
+          updated_at?: string
+          wp_token?: string
+          wp_url?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
