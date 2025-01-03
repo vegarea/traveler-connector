@@ -1,4 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { AdminAuth } from './auth/AdminAuth';
 import {
   Sidebar,
   SidebarContent,
@@ -10,8 +13,8 @@ import {
   SidebarGroupLabel,
   SidebarProvider,
 } from "@/components/ui/sidebar";
-import { Settings, Users, Webhook, Globe, Activity, Shield } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Settings, LogOut } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const menuItems = [
   {
@@ -24,6 +27,53 @@ const menuItems = [
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [session, setSession] = React.useState<any>(null);
+  const [loading, setLoading] = React.useState(true);
+
+  useEffect(() => {
+    // Verificar sesión actual
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    // Escuchar cambios en la autenticación
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "Sesión cerrada",
+        description: "Has cerrado sesión correctamente.",
+      });
+      navigate('/admin');
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo cerrar la sesión.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+    </div>;
+  }
+
+  if (!session) {
+    return <AdminAuth />;
+  }
 
   return (
     <SidebarProvider>
@@ -51,6 +101,19 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
                 </SidebarMenu>
               </SidebarGroup>
             ))}
+            <SidebarGroup>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    onClick={handleLogout}
+                    tooltip="Cerrar sesión"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Cerrar sesión</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroup>
           </SidebarContent>
         </Sidebar>
         <main className="flex-1 p-6 overflow-auto">
