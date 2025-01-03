@@ -11,7 +11,14 @@ function App() {
         <Route path="/" element={<Index />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/members/:username" element={<MemberProfile />} />
-        <Route path="/admin/*" element={<AdminLayout />} />
+        <Route 
+          path="/admin/*" 
+          element={
+            <AdminLayout>
+              {/* Admin routes will be rendered here */}
+            </AdminLayout>
+          } 
+        />
       </Routes>
     </Router>
   );
