@@ -21,7 +21,7 @@ export const SyncStats = () => {
           .select('created_at')
           .order('created_at', { ascending: false })
           .limit(1)
-          .single()
+          .maybeSingle()
           .then(({ data }) => data?.created_at)
       ]);
 
