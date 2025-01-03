@@ -6,6 +6,8 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
+import { UserRolesTable, UsersTable, WordPressConfigTable } from './tables';
+
 export interface Database {
   public: {
     Tables: {
