@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Permission {
   endpoint: string;
@@ -49,7 +50,7 @@ export const PermissionsCheck = () => {
     }
   });
 
-  const { data: permissions, isLoading, refetch } = useQuery({
+  const { data: permissions, isLoading: permissionsLoading, refetch } = useQuery({
     queryKey: ['wordpress-permissions', wpConfig],
     queryFn: async () => {
       if (!wpConfig?.wp_url || !wpConfig?.wp_token) {
@@ -73,6 +74,29 @@ export const PermissionsCheck = () => {
     retry: false
   });
 
+  // Nueva consulta para obtener la estructura de usuarios
+  const { data: userStructure, isLoading: userStructureLoading } = useQuery({
+    queryKey: ['wordpress-user-structure', wpConfig],
+    queryFn: async () => {
+      if (!wpConfig?.wp_url || !wpConfig?.wp_token) {
+        throw new Error('WordPress no está configurado');
+      }
+
+      const response = await fetch(`${wpConfig.wp_url}/wp-json/wp/v2/users/me`, {
+        headers: {
+          'Authorization': `Bearer ${wpConfig.wp_token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('No se pudo obtener la estructura de usuarios');
+      }
+
+      return response.json();
+    },
+    enabled: !!wpConfig?.wp_url && !!wpConfig?.wp_token
+  });
+
   const handleRefresh = () => {
     refetch();
     toast({
@@ -84,61 +108,92 @@ export const PermissionsCheck = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Permisos de WordPress</CardTitle>
+        <CardTitle>Permisos y Estructura de WordPress</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <p className="text-sm text-muted-foreground">
-              Verificación de acceso a endpoints necesarios
-            </p>
-            <Button
-              onClick={handleRefresh}
-              variant="outline"
-              size="sm"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                "Verificar permisos"
-              )}
-            </Button>
-          </div>
+        <Tabs defaultValue="permissions" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="permissions">Permisos</TabsTrigger>
+            <TabsTrigger value="structure">Estructura de Usuario</TabsTrigger>
+          </TabsList>
 
-          {isLoading ? (
-            <div className="flex items-center justify-center py-6">
-              <Loader2 className="h-6 w-6 animate-spin" />
-            </div>
-          ) : permissions ? (
-            <div className="space-y-4">
-              {permissions.map((permission) => (
-                <div
-                  key={permission.endpoint}
-                  className="flex items-center justify-between p-2 rounded-lg bg-muted"
+          <TabsContent value="permissions">
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <p className="text-sm text-muted-foreground">
+                  Verificación de acceso a endpoints necesarios
+                </p>
+                <Button
+                  onClick={handleRefresh}
+                  variant="outline"
+                  size="sm"
+                  disabled={permissionsLoading}
                 >
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium">{permission.description}</p>
-                    <code className="text-xs text-muted-foreground">
-                      {permission.endpoint}
-                    </code>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {permission.isAvailable ? (
-                      <CheckCircle2 className="h-5 w-5 text-green-500" />
-                    ) : (
-                      <XCircle className="h-5 w-5 text-red-500" />
-                    )}
-                  </div>
+                  {permissionsLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Verificar permisos"
+                  )}
+                </Button>
+              </div>
+
+              {permissionsLoading ? (
+                <div className="flex items-center justify-center py-6">
+                  <Loader2 className="h-6 w-6 animate-spin" />
                 </div>
-              ))}
+              ) : permissions ? (
+                <div className="space-y-4">
+                  {permissions.map((permission) => (
+                    <div
+                      key={permission.endpoint}
+                      className="flex items-center justify-between p-2 rounded-lg bg-muted"
+                    >
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium">{permission.description}</p>
+                        <code className="text-xs text-muted-foreground">
+                          {permission.endpoint}
+                        </code>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {permission.isAvailable ? (
+                          <CheckCircle2 className="h-5 w-5 text-green-500" />
+                        ) : (
+                          <XCircle className="h-5 w-5 text-red-500" />
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground py-4">
+                  No se pudo verificar los permisos. Asegúrate de que WordPress esté correctamente configurado.
+                </p>
+              )}
             </div>
-          ) : (
-            <p className="text-sm text-muted-foreground py-4">
-              No se pudo verificar los permisos. Asegúrate de que WordPress esté correctamente configurado.
-            </p>
-          )}
-        </div>
+          </TabsContent>
+
+          <TabsContent value="structure">
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Estructura actual del usuario en WordPress
+              </p>
+              
+              {userStructureLoading ? (
+                <div className="flex items-center justify-center py-6">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                </div>
+              ) : userStructure ? (
+                <pre className="bg-muted p-4 rounded-lg overflow-auto max-h-96 text-xs">
+                  {JSON.stringify(userStructure, null, 2)}
+                </pre>
+              ) : (
+                <p className="text-sm text-muted-foreground py-4">
+                  No se pudo obtener la estructura del usuario. Verifica la conexión con WordPress.
+                </p>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );
