@@ -1,21 +1,57 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Users, Flag, Star, Trophy, Plane, UsersRound } from "lucide-react";
+import { MapPin, Users, Flag, Star, Trophy, Plane, UsersRound, ExternalLink } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import ProfileMap from '@/components/ProfileMap';
 import ProfileStats from '@/components/ProfileStats';
 import TravelBadges from '@/components/TravelBadges';
 import PublishedTrips from '@/components/PublishedTrips';
 import TravelGroups from '@/components/TravelGroups';
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 const Profile = () => {
+  // Fetch WordPress config and user data
+  const { data: wpConfig } = useQuery({
+    queryKey: ['wordpress-config'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('wordpress_config')
+        .select('*')
+        .single();
+      return data;
+    },
+  });
+
+  const { data: wpUserData, isLoading } = useQuery({
+    queryKey: ['wordpress-user', wpConfig?.wp_url],
+    queryFn: async () => {
+      if (!wpConfig?.wp_url || !wpConfig?.wp_token) return null;
+      
+      const response = await fetch(`${wpConfig.wp_url}/wp-json/wp/v2/users/me`, {
+        headers: {
+          'Authorization': `Bearer ${wpConfig.wp_token}`
+        }
+      });
+      
+      if (!response.ok) throw new Error('Failed to fetch WordPress user data');
+      return response.json();
+    },
+    enabled: !!wpConfig?.wp_url && !!wpConfig?.wp_token,
+  });
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Cover Photo */}
       <div className="relative h-[300px] w-full">
         <img
-          src="https://images.unsplash.com/photo-1469474968028-56623f02e42e"
+          src={wpUserData?.banner_url || "https://images.unsplash.com/photo-1469474968028-56623f02e42e"}
           alt="Cover"
           className="w-full h-full object-cover"
         />
@@ -28,11 +64,26 @@ const Profile = () => {
           {/* Avatar and Basic Info */}
           <div className="flex flex-col items-center">
             <Avatar className="w-32 h-32 border-4 border-background">
-              <AvatarImage src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158" />
-              <AvatarFallback>JD</AvatarFallback>
+              <AvatarImage src={wpUserData?.avatar_urls?.['96'] || ''} />
+              <AvatarFallback>
+                {wpUserData?.name ? wpUserData.name.charAt(0) : 'U'}
+              </AvatarFallback>
             </Avatar>
-            <h1 className="mt-4 text-3xl font-bold">Jane Doe</h1>
-            <Badge variant="secondary" className="mt-2">Premium Member</Badge>
+            <h1 className="mt-4 text-3xl font-bold">{wpUserData?.name || 'Usuario'}</h1>
+            <p className="mt-2 text-muted-foreground text-center max-w-2xl">
+              {wpUserData?.description || 'Sin descripción'}
+            </p>
+            {wpUserData?.link && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-4"
+                onClick={() => window.open(wpUserData.link, '_blank')}
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                Ver perfil en WordPress
+              </Button>
+            )}
             <div className="flex items-center gap-4 mt-4">
               <div className="flex items-center gap-2">
                 <Users className="w-4 h-4" />
