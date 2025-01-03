@@ -13,7 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 
 const Profile = () => {
-  // Fetch WordPress config and user data
+  // Fetch WordPress config
   const { data: wpConfig } = useQuery({
     queryKey: ['wordpress-config'],
     queryFn: async () => {
@@ -28,21 +28,30 @@ const Profile = () => {
     },
   });
 
+  // Fetch WordPress user data
   const { data: wpUserData, isLoading } = useQuery({
     queryKey: ['wordpress-user', wpConfig?.wp_url],
     queryFn: async () => {
-      if (!wpConfig?.wp_url || !wpConfig?.wp_token) return null;
-      
+      if (!wpConfig?.wp_url || !wpConfig?.wp_token || !wpConfig?.wp_username) {
+        throw new Error('WordPress configuration is incomplete');
+      }
+
+      // Usar autenticación Basic con usuario y token
       const response = await fetch(`${wpConfig.wp_url}/wp-json/wp/v2/users/me`, {
         headers: {
-          'Authorization': `Bearer ${wpConfig.wp_token}`
-        }
+          'Authorization': `Basic ${btoa(`${wpConfig.wp_username}:${wpConfig.wp_token}`)}`,
+          'Content-Type': 'application/json',
+        },
       });
-      
-      if (!response.ok) throw new Error('Failed to fetch WordPress user data');
+
+      if (!response.ok) {
+        console.error('WordPress API Error:', await response.text());
+        throw new Error('Failed to fetch WordPress user data');
+      }
+
       return response.json();
     },
-    enabled: !!wpConfig?.wp_url && !!wpConfig?.wp_token,
+    enabled: !!wpConfig?.wp_url && !!wpConfig?.wp_token && !!wpConfig?.wp_username,
   });
 
   if (isLoading) {
