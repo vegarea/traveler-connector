@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminAuth } from './auth/AdminAuth';
 import {
@@ -112,12 +112,11 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
                 <SidebarMenu>
                   {group.items.map((item) => (
                     <SidebarMenuItem key={item.path}>
-                      <SidebarMenuButton
-                        onClick={() => navigate(item.path)}
-                        tooltip={item.title}
-                      >
-                        <item.icon className="w-4 h-4" />
-                        <span>{item.title}</span>
+                      <SidebarMenuButton asChild tooltip={item.title}>
+                        <Link to={item.path}>
+                          <item.icon className="w-4 h-4" />
+                          <span>{item.title}</span>
+                        </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   ))}
