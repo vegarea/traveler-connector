@@ -7,7 +7,7 @@ interface SidebarHeaderProps {
 
 export const SidebarHeader = ({ headerLogo }: SidebarHeaderProps) => {
   return (
-    <div className="p-6 border-b bg-gradient-to-br from-purple-600/10 to-blue-600/10 dark:from-gray-800 dark:to-gray-900">
+    <div className="p-6 border-b bg-gradient-to-br from-[#F4007A]/10 to-[#F4007A]/5 dark:from-gray-800 dark:to-gray-900">
       {headerLogo ? (
         <img 
           src={headerLogo.url} 
@@ -15,7 +15,7 @@ export const SidebarHeader = ({ headerLogo }: SidebarHeaderProps) => {
           className="h-8 object-contain"
         />
       ) : (
-        <h2 className="text-xl font-semibold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+        <h2 className="text-xl font-semibold bg-gradient-to-r from-[#F4007A] to-[#F4007A]/80 bg-clip-text text-transparent">
           Panel Admin
         </h2>
       )}
