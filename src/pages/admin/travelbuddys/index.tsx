@@ -1,13 +1,14 @@
 import { Routes, Route } from 'react-router-dom';
 import ProfilesConfig from './ProfilesConfig';
-import SettingsConfig from './SettingsConfig';
+import GroupsConfig from './GroupsConfig';
+import ActivityConfig from './ActivityConfig';
 
 const TravelbuddysRoutes = () => {
   return (
     <Routes>
-      <Route index element={<ProfilesConfig />} />
       <Route path="profiles" element={<ProfilesConfig />} />
-      <Route path="settings" element={<SettingsConfig />} />
+      <Route path="groups" element={<GroupsConfig />} />
+      <Route path="activity" element={<ActivityConfig />} />
     </Routes>
   );
 };
