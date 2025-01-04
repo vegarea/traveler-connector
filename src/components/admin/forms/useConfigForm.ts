@@ -131,23 +131,6 @@ export const useConfigForm = () => {
         description: "Los cambios han sido guardados correctamente.",
       });
 
-      // Verificar la configuración de redirección
-      const redirectUrl = new URL('/wp-json/jwt-auth/v1/token/validate', cleanValues.wp_url);
-      const redirectResponse = await fetch(redirectUrl.toString(), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!redirectResponse.ok) {
-        toast({
-          title: "Advertencia",
-          description: "La configuración de redirección en WordPress podría no estar correctamente configurada.",
-          variant: "destructive",
-        });
-      }
-
     } catch (error) {
       console.error('Error saving WordPress config:', error);
       toast({
