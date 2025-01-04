@@ -59,9 +59,13 @@ export const validateJWTToken = async (wpUrl: string, token: string) => {
 export const checkEndpoint = async (endpoint: string, wpUrl: string, wpUsername: string, wpToken: string) => {
   console.log(`Verificando endpoint: ${endpoint}`);
   try {
+    // Primero obtenemos un token JWT usando las credenciales
+    const jwtResponse = await getJWTToken(wpUrl, wpUsername, wpToken);
+    
+    // Usamos el token JWT para la verificación del endpoint
     const response = await fetch(`${wpUrl}/wp-json${endpoint}`, {
       headers: {
-        'Authorization': `Bearer ${wpToken}`
+        'Authorization': `Bearer ${jwtResponse.token}`
       }
     });
     
@@ -88,9 +92,12 @@ export const checkEndpoint = async (endpoint: string, wpUrl: string, wpUsername:
 
 export const fetchUserStructure = async (wpUrl: string, wpUsername: string, wpToken: string) => {
   try {
+    // Primero obtenemos un token JWT usando las credenciales
+    const jwtResponse = await getJWTToken(wpUrl, wpUsername, wpToken);
+    
     const response = await fetch(`${wpUrl}/wp-json/wp/v2/users/me`, {
       headers: {
-        'Authorization': `Bearer ${wpToken}`
+        'Authorization': `Bearer ${jwtResponse.token}`
       }
     });
 
