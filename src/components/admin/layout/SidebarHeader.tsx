@@ -8,7 +8,7 @@ interface SidebarHeaderProps {
 
 export const SidebarHeader = ({ headerLogo, isCollapsed }: SidebarHeaderProps) => {
   return (
-    <div className="p-6 border-b border-sidebar-border bg-gradient-to-br from-[#F4007A]/5 to-transparent">
+    <div className="p-6 border-b border-slate-200 bg-gradient-to-br from-white to-slate-50">
       {headerLogo ? (
         <img 
           src={headerLogo.url} 

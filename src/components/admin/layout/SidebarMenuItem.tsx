@@ -25,9 +25,9 @@ export const SidebarMenuItem = ({
         to={item.submenu ? '#' : item.path}
         className={cn(
           "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200",
-          "hover:bg-sidebar-accent/50 active:bg-sidebar-accent",
+          "hover:bg-slate-50 active:bg-slate-100",
           "group relative",
-          isActive && "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+          isActive && "bg-[#F4007A]/5 text-[#F4007A] font-medium shadow-sm"
         )}
         onClick={(e) => {
           if (item.submenu) {
@@ -40,14 +40,14 @@ export const SidebarMenuItem = ({
           "w-5 h-5 transition-colors",
           isActive 
             ? "text-[#F4007A]" 
-            : "text-muted-foreground group-hover:text-foreground"
+            : "text-slate-500 group-hover:text-slate-800"
         )} />
         {!isCollapsed && (
           <>
-            <span className="flex-1">{item.title}</span>
+            <span className="flex-1 text-slate-700 group-hover:text-slate-900">{item.title}</span>
             {item.submenu && (
               <ChevronDown className={cn(
-                "w-4 h-4 transition-transform duration-200",
+                "w-4 h-4 text-slate-400 transition-transform duration-200",
                 isSubmenuOpen && "rotate-180"
               )} />
             )}
@@ -56,26 +56,26 @@ export const SidebarMenuItem = ({
       </Link>
 
       {!isCollapsed && item.submenu && isSubmenuOpen && (
-        <div className="ml-4 pl-4 border-l border-sidebar-border space-y-1">
+        <div className="ml-4 pl-4 border-l border-slate-200 space-y-1">
           {item.submenu.map((subItem) => (
             <Link
               key={subItem.path}
               to={subItem.path}
               className={cn(
                 "flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200",
-                "text-sm hover:bg-sidebar-accent/50 active:bg-sidebar-accent",
+                "text-sm hover:bg-slate-50 active:bg-slate-100",
                 "group",
                 isActiveSubmenuItem(subItem.path) && 
-                "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                "bg-[#F4007A]/5 text-[#F4007A] font-medium shadow-sm"
               )}
             >
               <subItem.icon className={cn(
                 "w-4 h-4",
                 isActiveSubmenuItem(subItem.path)
                   ? "text-[#F4007A]"
-                  : "text-muted-foreground group-hover:text-foreground"
+                  : "text-slate-500 group-hover:text-slate-800"
               )} />
-              <span>{subItem.title}</span>
+              <span className="text-slate-700 group-hover:text-slate-900">{subItem.title}</span>
             </Link>
           ))}
         </div>
