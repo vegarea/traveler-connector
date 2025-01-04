@@ -59,17 +59,17 @@ export const ConfigFormFields = ({ form }: ConfigFormFieldsProps) => {
         name="wp_token"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-slate-700">API Key</FormLabel>
+            <FormLabel className="text-slate-700">Contraseña de WordPress</FormLabel>
             <FormControl>
               <Input 
                 type="password" 
-                placeholder="wp_xxxxx..." 
+                placeholder="Tu contraseña de WordPress" 
                 {...field} 
                 className="bg-white/70 border-slate-200 focus:border-[#F4007A]/30 focus:ring-[#F4007A]/10 transition-all duration-200"
               />
             </FormControl>
             <FormDescription>
-              Token de aplicación generado en WordPress
+              La contraseña de tu usuario de WordPress
             </FormDescription>
             <FormMessage />
           </FormItem>

@@ -15,7 +15,7 @@ export const useConfigForm = () => {
     defaultValues: {
       wp_url: "",
       wp_username: "",
-      wp_token: "",
+      wp_token: "", // Ahora esto será la contraseña del usuario de WordPress
       sync_users: false,
       sync_interval: 15,
       auth_callback_url: window.location.origin + '/auth/wordpress/callback',
@@ -60,17 +60,18 @@ export const useConfigForm = () => {
     try {
       const configToTest = values || form.getValues();
       
-      // Eliminar espacios en blanco del token
-      const cleanToken = configToTest.wp_token.replace(/\s+/g, '');
-      
       console.log('Iniciando prueba de conexión con WordPress usando JWT...');
+      console.log('URL:', configToTest.wp_url);
+      console.log('Usuario:', configToTest.wp_username);
 
-      // Obtener token JWT
+      // Obtener token JWT usando usuario y contraseña
       const jwtResponse = await getJWTToken(
         configToTest.wp_url,
         configToTest.wp_username,
-        cleanToken
+        configToTest.wp_token // Usamos el campo wp_token como contraseña
       );
+
+      console.log('Respuesta JWT:', jwtResponse);
 
       // Validar el token JWT
       await validateJWTToken(configToTest.wp_url, jwtResponse.token);
@@ -88,7 +89,7 @@ export const useConfigForm = () => {
       setIsConnected(false);
       toast({
         title: "Error de conexión",
-        description: error instanceof Error ? error.message : "Error al conectar con WordPress. Verifica las credenciales y que el plugin JWT Auth esté activo.",
+        description: error instanceof Error ? error.message : "Error al conectar con WordPress. Verifica las credenciales.",
         variant: "destructive",
       });
       return false;
@@ -97,14 +98,8 @@ export const useConfigForm = () => {
 
   const onSubmit = async (values: ConfigFormValues) => {
     try {
-      // Eliminar espacios en blanco del token antes de guardar
-      const cleanValues = {
-        ...values,
-        wp_token: values.wp_token.replace(/\s+/g, '')
-      };
-      
       // Primero probar la conexión
-      const isConnected = await testConnection(cleanValues);
+      const isConnected = await testConnection(values);
       
       if (!isConnected) {
         return;
@@ -113,13 +108,13 @@ export const useConfigForm = () => {
       const { error } = await supabase
         .from('wordpress_config')
         .upsert({
-          wp_url: cleanValues.wp_url,
-          wp_username: cleanValues.wp_username,
-          wp_token: cleanValues.wp_token,
-          sync_users: cleanValues.sync_users,
-          sync_interval: cleanValues.sync_interval,
-          auth_callback_url: cleanValues.auth_callback_url,
-          app_url: cleanValues.app_url,
+          wp_url: values.wp_url,
+          wp_username: values.wp_username,
+          wp_token: values.wp_token,
+          sync_users: values.sync_users,
+          sync_interval: values.sync_interval,
+          auth_callback_url: values.auth_callback_url,
+          app_url: values.app_url,
         });
 
       if (error) {
