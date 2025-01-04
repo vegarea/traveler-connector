@@ -5,11 +5,11 @@ import { Form } from "@/components/ui/form";
 import { ConfigFormFields } from './forms/ConfigFormFields';
 import { useConfigForm } from './forms/useConfigForm';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, User } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const WordPressConfigForm = () => {
-  const { form, onSubmit, testConnection, isConnected } = useConfigForm();
+  const { form, onSubmit, testConnection, isConnected, connectionInfo } = useConfigForm();
 
   return (
     <div className="space-y-6">
@@ -42,16 +42,20 @@ export const WordPressConfigForm = () => {
         </CardContent>
       </Card>
 
-      {isConnected && (
+      {isConnected && connectionInfo && (
         <Alert className="bg-green-50 border-green-200">
           <CheckCircle2 className="h-4 w-4 text-green-600" />
-          <AlertTitle>Conexión establecida correctamente</AlertTitle>
-          <AlertDescription className="mt-2">
-            La conexión con WordPress está configurada. Ahora puedes{' '}
-            <Link to="/admin/settings/permissions" className="font-medium text-green-700 hover:text-green-800">
-              verificar los permisos necesarios
-            </Link>{' '}
-            para sincronizar los datos.
+          <AlertTitle>Conexión JWT establecida correctamente</AlertTitle>
+          <AlertDescription className="mt-2 space-y-2">
+            <div className="flex items-center gap-2 text-green-700">
+              <User className="h-4 w-4" />
+              <span>Usuario conectado: {connectionInfo.user_display_name}</span>
+            </div>
+            <div className="text-sm text-green-600">
+              Email: {connectionInfo.user_email}
+              <br />
+              Nombre de usuario: {connectionInfo.user_nicename}
+            </div>
           </AlertDescription>
         </Alert>
       )}

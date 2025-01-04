@@ -6,16 +6,23 @@ import { configSchema, ConfigFormValues } from './types';
 import { useEffect, useState } from "react";
 import { getJWTToken, validateJWTToken } from "../permissions/utils/wordpressApi";
 
+interface ConnectionInfo {
+  user_display_name: string;
+  user_email: string;
+  user_nicename: string;
+}
+
 export const useConfigForm = () => {
   const { toast } = useToast();
   const [isConnected, setIsConnected] = useState(false);
+  const [connectionInfo, setConnectionInfo] = useState<ConnectionInfo | null>(null);
   
   const form = useForm<ConfigFormValues>({
     resolver: zodResolver(configSchema),
     defaultValues: {
       wp_url: "",
       wp_username: "",
-      wp_token: "", // Ahora esto será la contraseña del usuario de WordPress
+      wp_token: "",
       sync_users: false,
       sync_interval: 15,
       auth_callback_url: window.location.origin + '/auth/wordpress/callback',
@@ -68,7 +75,7 @@ export const useConfigForm = () => {
       const jwtResponse = await getJWTToken(
         configToTest.wp_url,
         configToTest.wp_username,
-        configToTest.wp_token // Usamos el campo wp_token como contraseña
+        configToTest.wp_token
       );
 
       console.log('Respuesta JWT:', jwtResponse);
@@ -77,9 +84,14 @@ export const useConfigForm = () => {
       await validateJWTToken(configToTest.wp_url, jwtResponse.token);
 
       setIsConnected(true);
+      setConnectionInfo({
+        user_display_name: jwtResponse.user_display_name,
+        user_email: jwtResponse.user_email,
+        user_nicename: jwtResponse.user_nicename
+      });
       
       toast({
-        title: "Conexión exitosa",
+        title: "Conexión JWT exitosa",
         description: `Conectado como: ${jwtResponse.user_display_name}`,
       });
 
@@ -87,6 +99,7 @@ export const useConfigForm = () => {
     } catch (error) {
       console.error('Error testing WordPress connection:', error);
       setIsConnected(false);
+      setConnectionInfo(null);
       toast({
         title: "Error de conexión",
         description: error instanceof Error ? error.message : "Error al conectar con WordPress. Verifica las credenciales.",
@@ -142,5 +155,6 @@ export const useConfigForm = () => {
     onSubmit,
     testConnection: () => testConnection(form.getValues()),
     isConnected,
+    connectionInfo,
   };
 };
