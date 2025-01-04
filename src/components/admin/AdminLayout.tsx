@@ -7,21 +7,18 @@ import {
   UserCircle, 
   Users2, 
   Activity,
-  Palette,
-  ChevronLeft
+  Palette
 } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
 import { SidebarHeader } from './layout/SidebarHeader';
 import { SidebarMenuItem } from './layout/SidebarMenuItem';
 import { LogoutButton } from './layout/LogoutButton';
 import type { MenuItem, LogoConfig } from './layout/types';
-import { cn } from "@/lib/utils";
 
 const AdminLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [headerLogo, setHeaderLogo] = useState<LogoConfig | null>(null);
-  const [isCollapsed, setIsCollapsed] = useState(false);
   
   useEffect(() => {
     const fetchLogo = async () => {
@@ -116,30 +113,9 @@ const AdminLayout = () => {
   return (
     <div className="flex h-screen w-full bg-background">
       {/* Sidebar */}
-      <aside 
-        className={cn(
-          "flex flex-col bg-sidebar transition-all duration-300 ease-in-out",
-          isCollapsed ? "w-20" : "w-72"
-        )}
-      >
-        <nav className="h-full flex flex-col relative">
-          {/* Collapse Button */}
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className={cn(
-              "absolute -right-4 top-6 z-50",
-              "w-8 h-8 rounded-full bg-accent flex items-center justify-center",
-              "text-accent-foreground hover:bg-accent/90 transition-colors",
-              "shadow-lg border border-border"
-            )}
-          >
-            <ChevronLeft className={cn(
-              "w-5 h-5 transition-transform duration-300",
-              isCollapsed && "rotate-180"
-            )} />
-          </button>
-
-          <SidebarHeader headerLogo={headerLogo} isCollapsed={isCollapsed} />
+      <aside className="w-72 flex flex-col bg-sidebar">
+        <nav className="h-full flex flex-col">
+          <SidebarHeader headerLogo={headerLogo} isCollapsed={false} />
           
           {/* Menu Items */}
           <div className="flex-1 overflow-y-auto py-6 px-4 space-y-1">
@@ -149,12 +125,12 @@ const AdminLayout = () => {
                 item={item}
                 isActive={isActiveRoute(item.path)}
                 isActiveSubmenuItem={isActiveSubmenuItem}
-                isCollapsed={isCollapsed}
+                isCollapsed={false}
               />
             ))}
           </div>
           
-          <LogoutButton onLogout={handleLogout} isCollapsed={isCollapsed} />
+          <LogoutButton onLogout={handleLogout} isCollapsed={false} />
         </nav>
       </aside>
 
