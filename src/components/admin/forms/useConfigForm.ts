@@ -16,10 +16,11 @@ export const useConfigForm = () => {
       wp_token: "",
       sync_users: false,
       sync_interval: 15,
+      auth_callback_url: 'https://preview--traveler-connector.lovable.app/auth/wordpress/callback',
+      app_url: 'https://preview--traveler-connector.lovable.app',
     },
   });
 
-  // Cargar configuración existente al montar el componente
   useEffect(() => {
     const loadConfig = async () => {
       const { data, error } = await supabase
@@ -41,6 +42,8 @@ export const useConfigForm = () => {
           wp_token: config.wp_token,
           sync_users: config.sync_users || false,
           sync_interval: config.sync_interval || 15,
+          auth_callback_url: config.auth_callback_url || 'https://preview--traveler-connector.lovable.app/auth/wordpress/callback',
+          app_url: config.app_url || 'https://preview--traveler-connector.lovable.app',
         });
       }
     };
@@ -114,6 +117,8 @@ export const useConfigForm = () => {
           wp_token: cleanValues.wp_token,
           sync_users: cleanValues.sync_users,
           sync_interval: cleanValues.sync_interval,
+          auth_callback_url: cleanValues.auth_callback_url,
+          app_url: cleanValues.app_url,
         });
 
       if (error) {

@@ -272,6 +272,8 @@ export type Database = {
       }
       wordpress_config: {
         Row: {
+          app_url: string | null
+          auth_callback_url: string | null
           created_at: string
           id: string
           sync_interval: number | null
@@ -282,6 +284,8 @@ export type Database = {
           wp_username: string
         }
         Insert: {
+          app_url?: string | null
+          auth_callback_url?: string | null
           created_at?: string
           id?: string
           sync_interval?: number | null
@@ -292,6 +296,8 @@ export type Database = {
           wp_username: string
         }
         Update: {
+          app_url?: string | null
+          auth_callback_url?: string | null
           created_at?: string
           id?: string
           sync_interval?: number | null

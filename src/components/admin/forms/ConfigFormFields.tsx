@@ -69,6 +69,42 @@ export const ConfigFormFields = ({ form }: ConfigFormFieldsProps) => {
 
       <FormField
         control={form.control}
+        name="auth_callback_url"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-slate-700">URL de Callback</FormLabel>
+            <FormControl>
+              <Input 
+                placeholder="https://preview--traveler-connector.lovable.app/auth/wordpress/callback" 
+                {...field} 
+                className="bg-white/70 border-slate-200 focus:border-[#F4007A]/30 focus:ring-[#F4007A]/10 transition-all duration-200"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="app_url"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-slate-700">URL de la Aplicación</FormLabel>
+            <FormControl>
+              <Input 
+                placeholder="https://preview--traveler-connector.lovable.app" 
+                {...field} 
+                className="bg-white/70 border-slate-200 focus:border-[#F4007A]/30 focus:ring-[#F4007A]/10 transition-all duration-200"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
         name="sync_users"
         render={({ field }) => (
           <FormItem className="flex items-center space-x-2 space-y-0">
