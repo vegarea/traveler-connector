@@ -18,20 +18,19 @@ export const useWordPressUser = () => {
   });
 
   const createWordPressUser = async (values: TestUserFormValues) => {
-    if (!wpConfig?.wp_url || !wpConfig?.wp_username || !wpConfig?.wp_token) {
+    if (!wpConfig?.wp_url || !wpConfig?.wp_username || !wpConfig?.wp_api_token) {
       throw new Error('WordPress configuration is missing');
     }
 
     try {
-      console.log('Creando usuario en WordPress...');
+      console.log('Creando usuario en WordPress usando API token...');
       
-      // Add CORS mode and credentials
       const response = await fetch(`${wpConfig.wp_url}/wp-json/wp/v2/users`, {
         method: 'POST',
         mode: 'cors',
         credentials: 'include',
         headers: {
-          'Authorization': `Basic ${btoa(`${wpConfig.wp_username}:${wpConfig.wp_token}`)}`,
+          'Authorization': `Basic ${btoa(`${wpConfig.wp_username}:${wpConfig.wp_api_token}`)}`,
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },

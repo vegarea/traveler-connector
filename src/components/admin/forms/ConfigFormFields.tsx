@@ -69,7 +69,29 @@ export const ConfigFormFields = ({ form }: ConfigFormFieldsProps) => {
               />
             </FormControl>
             <FormDescription>
-              La contraseña de tu usuario de WordPress
+              La contraseña de tu usuario de WordPress (para autenticación JWT)
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="wp_api_token"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-slate-700">Token de API de WordPress</FormLabel>
+            <FormControl>
+              <Input 
+                type="password" 
+                placeholder="Tu Application Password de WordPress" 
+                {...field} 
+                className="bg-white/70 border-slate-200 focus:border-[#F4007A]/30 focus:ring-[#F4007A]/10 transition-all duration-200"
+              />
+            </FormControl>
+            <FormDescription>
+              Application Password generada en WordPress (para operaciones de API)
             </FormDescription>
             <FormMessage />
           </FormItem>

@@ -279,6 +279,7 @@ export type Database = {
           sync_interval: number | null
           sync_users: boolean | null
           updated_at: string
+          wp_api_token: string | null
           wp_token: string
           wp_url: string
           wp_username: string
@@ -291,6 +292,7 @@ export type Database = {
           sync_interval?: number | null
           sync_users?: boolean | null
           updated_at?: string
+          wp_api_token?: string | null
           wp_token: string
           wp_url: string
           wp_username: string
@@ -303,6 +305,7 @@ export type Database = {
           sync_interval?: number | null
           sync_users?: boolean | null
           updated_at?: string
+          wp_api_token?: string | null
           wp_token?: string
           wp_url?: string
           wp_username?: string
