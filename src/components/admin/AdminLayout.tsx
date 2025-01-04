@@ -7,7 +7,8 @@ import {
   UserCircle, 
   Users2, 
   Activity,
-  LogOut 
+  LogOut,
+  Palette 
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
@@ -62,6 +63,11 @@ const AdminLayout = () => {
           title: "Permisos",
           path: "/admin/settings/permissions",
           icon: Users,
+        },
+        {
+          title: "Estilo y Marca",
+          path: "/admin/settings/style",
+          icon: Palette,
         },
       ],
     },
