@@ -111,14 +111,14 @@ const AdminLayout = () => {
   };
 
   return (
-    <div className="flex h-screen w-full bg-gradient-to-br from-slate-200 to-slate-100">
-      {/* Sidebar con gradiente sutil y sombra mejorada */}
+    <div className="flex min-h-screen w-full">
+      {/* Sidebar sin márgenes externos */}
       <aside className="w-72 flex flex-col bg-gradient-to-b from-white via-slate-100 to-slate-200 border-r border-slate-200 shadow-lg">
         <nav className="h-full flex flex-col">
           <SidebarHeader headerLogo={headerLogo} isCollapsed={false} />
           
-          {/* Menu Items con mejor espaciado y efectos hover */}
-          <div className="flex-1 overflow-y-auto py-6 px-4 space-y-1">
+          {/* Menu Items */}
+          <div className="flex-1 overflow-y-auto py-6 space-y-1">
             {menuItems.map((item) => (
               <SidebarMenuItem
                 key={item.path}
@@ -134,10 +134,10 @@ const AdminLayout = () => {
         </nav>
       </aside>
 
-      {/* Main Content con gradiente y sombra interna */}
-      <main className="flex-1 flex flex-col overflow-hidden bg-gradient-to-br from-slate-100 to-white">
+      {/* Main Content sin márgenes externos */}
+      <main className="flex-1 flex flex-col overflow-hidden bg-gradient-to-br from-slate-200 to-slate-100">
         <div className="flex-1 overflow-y-auto">
-          <div className="p-8 max-w-7xl mx-auto w-full space-y-6">
+          <div className="p-8 max-w-7xl mx-auto w-full">
             <Outlet />
           </div>
         </div>
