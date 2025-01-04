@@ -7,14 +7,14 @@ import SettingsRoutes from './settings';
 
 const AdminRoutes = () => {
   return (
-    <AdminLayout>
-      <Routes>
+    <Routes>
+      <Route element={<AdminLayout />}>
         <Route index element={<Dashboard />} />
         <Route path="users" element={<Users />} />
         <Route path="travelbuddies/*" element={<TravelbuddysRoutes />} />
         <Route path="settings/*" element={<SettingsRoutes />} />
-      </Routes>
-    </AdminLayout>
+      </Route>
+    </Routes>
   );
 };
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Users, 
@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
-const AdminLayout = ({ children }: { children: React.ReactNode }) => {
+const AdminLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
@@ -161,8 +161,8 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto">
-        {children}
+      <main className="flex-1 overflow-y-auto p-6">
+        <Outlet />
       </main>
     </div>
   );
