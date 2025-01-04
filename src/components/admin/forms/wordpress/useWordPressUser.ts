@@ -3,32 +3,48 @@ import { supabase } from "@/integrations/supabase/client";
 import { TestUserFormValues } from "./types";
 
 export const useWordPressUser = () => {
-  const { data: wpConfig } = useQuery({
+  const { data: wpConfig, isLoading: isConfigLoading } = useQuery({
     queryKey: ['wordpress-config'],
     queryFn: async () => {
+      console.log('Obteniendo configuración de WordPress...');
       const { data, error } = await supabase
         .from('wordpress_config')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(1);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error al obtener configuración:', error);
+        throw error;
+      }
+      
+      if (!data || data.length === 0) {
+        console.error('No hay configuración de WordPress');
+        throw new Error('No hay configuración de WordPress guardada');
+      }
+
+      console.log('Configuración obtenida:', data[0]);
       return data[0];
     }
   });
 
   const createWordPressUser = async (values: TestUserFormValues) => {
+    if (isConfigLoading) {
+      throw new Error('Cargando configuración de WordPress...');
+    }
+
     if (!wpConfig?.wp_url || !wpConfig?.wp_username || !wpConfig?.wp_api_token) {
-      throw new Error('WordPress configuration is missing');
+      console.error('Configuración faltante:', wpConfig);
+      throw new Error('Configuración de WordPress incompleta. Asegúrate de haber guardado la URL, usuario y Application Password.');
     }
 
     try {
       console.log('Creando usuario en WordPress usando API token...');
+      console.log('URL:', wpConfig.wp_url);
+      console.log('Usuario admin:', wpConfig.wp_username);
       
       const response = await fetch(`${wpConfig.wp_url}/wp-json/wp/v2/users`, {
         method: 'POST',
-        mode: 'cors',
-        credentials: 'include',
         headers: {
           'Authorization': `Basic ${btoa(`${wpConfig.wp_username}:${wpConfig.wp_api_token}`)}`,
           'Content-Type': 'application/json',
@@ -48,9 +64,9 @@ export const useWordPressUser = () => {
       if (!response.ok) {
         try {
           const errorData = JSON.parse(responseText);
-          throw new Error(errorData.message || 'Error creating WordPress user');
+          throw new Error(errorData.message || 'Error al crear usuario en WordPress');
         } catch (e) {
-          throw new Error(`Error creating WordPress user: ${responseText}`);
+          throw new Error(`Error al crear usuario en WordPress: ${responseText}`);
         }
       }
 
@@ -63,5 +79,5 @@ export const useWordPressUser = () => {
     }
   };
 
-  return { createWordPressUser, wpConfig };
+  return { createWordPressUser, wpConfig, isConfigLoading };
 };
