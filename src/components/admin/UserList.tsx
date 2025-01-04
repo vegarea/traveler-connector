@@ -82,15 +82,15 @@ export const UserList = () => {
   }
 
   return (
-    <Card className="w-full shadow-sm">
-      <CardHeader>
+    <Card className="w-full bg-gradient-to-br from-white to-slate-50 shadow-md hover:shadow-lg transition-all duration-300 border border-slate-200">
+      <CardHeader className="bg-gradient-to-r from-slate-50 to-white border-b border-slate-200">
         <CardTitle>Lista de Usuarios</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="bg-slate-50 hover:bg-slate-100 transition-colors">
                 <TableHead className="w-[250px]">Usuario</TableHead>
                 <TableHead className="w-[250px]">Email</TableHead>
                 <TableHead className="w-[150px]">Estado</TableHead>
@@ -102,7 +102,7 @@ export const UserList = () => {
             </TableHeader>
             <TableBody>
               {users?.map((user) => (
-                <TableRow key={user.id}>
+                <TableRow key={user.id} className="hover:bg-slate-50 transition-colors">
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar>
