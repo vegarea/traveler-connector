@@ -5,27 +5,11 @@ import { Form } from "@/components/ui/form";
 import { ConfigFormFields } from './forms/ConfigFormFields';
 import { useConfigForm } from './forms/useConfigForm';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle2, User, LogIn } from "lucide-react";
-import { generateWordPressLoginUrl } from '@/utils/wordpressAuth';
-import { useToast } from "@/hooks/use-toast";
+import { CheckCircle2, User } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const WordPressConfigForm = () => {
   const { form, onSubmit, testConnection, isConnected, connectionInfo } = useConfigForm();
-  const { toast } = useToast();
-
-  const handleWordPressLogin = async () => {
-    try {
-      const loginUrl = await generateWordPressLoginUrl();
-      window.location.href = loginUrl;
-    } catch (error) {
-      console.error('Error al iniciar sesión con WordPress:', error);
-      toast({
-        title: "Error",
-        description: "No se pudo iniciar el proceso de login con WordPress",
-        variant: "destructive",
-      });
-    }
-  };
 
   return (
     <div className="space-y-6">
@@ -55,18 +39,6 @@ export const WordPressConfigForm = () => {
               </div>
             </form>
           </Form>
-
-          {isConnected && (
-            <div className="mt-6">
-              <Button
-                onClick={handleWordPressLogin}
-                className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-600 transition-all duration-200"
-              >
-                <LogIn className="w-4 h-4 mr-2" />
-                Iniciar sesión con WordPress
-              </Button>
-            </div>
-          )}
         </CardContent>
       </Card>
 
