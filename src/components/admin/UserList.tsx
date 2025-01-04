@@ -30,7 +30,7 @@ interface User {
   last_login_date: string | null;
   account_status: string;
   email_verified: boolean;
-  user_roles: { role: 'admin' | 'user' }[];
+  user_roles: UserRole[];
 }
 
 export const UserList = () => {
@@ -41,12 +41,15 @@ export const UserList = () => {
         .from('users')
         .select(`
           *,
-          user_roles:user_roles(role)
+          user_roles (role)
         `)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      return data as unknown as User[];
+      if (error) {
+        console.error('Error fetching users:', error);
+        throw error;
+      }
+      return data as User[];
     }
   });
 
