@@ -13,12 +13,32 @@ import {
   SidebarGroupLabel,
   SidebarProvider,
 } from "@/components/ui/sidebar";
-import { Settings, LogOut } from "lucide-react";
+import { Settings, LogOut, Users, Globe, UserCircle, Users2, Activity, Bell } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const menuItems = [
   {
+    group: "Usuarios",
+    icon: Users,
+    items: [
+      { title: "Gestión de Usuarios", icon: UserCircle, path: "/admin/users" },
+      { title: "Roles y Permisos", icon: Users2, path: "/admin/users/roles" },
+    ]
+  },
+  {
+    group: "Travelbuddys",
+    icon: Globe,
+    items: [
+      { title: "Perfiles de Viajero", icon: UserCircle, path: "/admin/travelbuddys/profiles" },
+      { title: "Grupos", icon: Users2, path: "/admin/travelbuddys/groups" },
+      { title: "Feed de Actividad", icon: Activity, path: "/admin/travelbuddys/feed" },
+      { title: "Notificaciones", icon: Bell, path: "/admin/travelbuddys/notifications" },
+      { title: "Configuración", icon: Settings, path: "/admin/travelbuddys/settings" },
+    ]
+  },
+  {
     group: "WordPress",
+    icon: Settings,
     items: [
       { title: "Panel de Control", icon: Settings, path: "/admin" },
     ]
@@ -85,7 +105,10 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           <SidebarContent>
             {menuItems.map((group) => (
               <SidebarGroup key={group.group}>
-                <SidebarGroupLabel>{group.group}</SidebarGroupLabel>
+                <SidebarGroupLabel>
+                  <group.icon className="w-4 h-4 mr-2" />
+                  {group.group}
+                </SidebarGroupLabel>
                 <SidebarMenu>
                   {group.items.map((item) => (
                     <SidebarMenuItem key={item.path}>
