@@ -112,12 +112,10 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
                 <SidebarMenu>
                   {group.items.map((item) => (
                     <SidebarMenuItem key={item.path}>
-                      <SidebarMenuButton asChild tooltip={item.title}>
-                        <Link to={item.path}>
-                          <item.icon className="w-4 h-4" />
-                          <span>{item.title}</span>
-                        </Link>
-                      </SidebarMenuButton>
+                      <Link to={item.path} className="flex items-center gap-2 w-full px-2 py-1.5 text-sm rounded-md hover:bg-accent">
+                        <item.icon className="w-4 h-4" />
+                        <span>{item.title}</span>
+                      </Link>
                     </SidebarMenuItem>
                   ))}
                 </SidebarMenu>
@@ -126,13 +124,13 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
             <SidebarGroup>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton
+                  <button
                     onClick={handleLogout}
-                    tooltip="Cerrar sesión"
+                    className="flex items-center gap-2 w-full px-2 py-1.5 text-sm rounded-md hover:bg-accent"
                   >
                     <LogOut className="w-4 h-4" />
                     <span>Cerrar sesión</span>
-                  </SidebarMenuButton>
+                  </button>
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroup>
