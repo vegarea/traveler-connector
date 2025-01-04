@@ -3,13 +3,12 @@
  * These are the official brand colors defined in /admin/settings/style
  */
 export const CORPORATE_COLORS = {
-  PRIMARY_PURPLE: '#9b87f5',
-  SECONDARY_PURPLE: '#7E69AB',
-  TERTIARY_PURPLE: '#6E59A5',
-  DARK_PURPLE: '#1A1F2C',
-  LIGHT_PURPLE: '#D6BCFA',
-  VIVID_PURPLE: '#8B5CF6',
-  SOFT_PURPLE: '#E5DEFF',
+  BLACK: '#000000',
+  WHITE: '#FFFFFF',
+  MAGENTA: '#F4007A',
+  PASTEL_BLUE: '#E2F3FD',
+  PASTEL_GREEN: '#E1F6EB',
+  PASTEL_PINK: '#FEEAF1',
 } as const;
 
 /**
@@ -17,14 +16,13 @@ export const CORPORATE_COLORS = {
  * These are the HSL equivalents of our corporate colors
  */
 export const TAILWIND_COLORS = {
-  primary: {
-    purple: '252 80% 74%',    // #9b87f5
-    secondary: '262 24% 54%', // #7E69AB
-    tertiary: '262 29% 50%',  // #6E59A5
-    dark: '222 25% 14%',      // #1A1F2C
-    light: '270 89% 86%',     // #D6BCFA
-    vivid: '263 84% 66%',     // #8B5CF6
-    soft: '252 100% 93%',     // #E5DEFF
+  black: '0 0% 0%',       // #000000
+  white: '0 0% 100%',     // #FFFFFF
+  magenta: '328 100% 48%', // #F4007A
+  pastel: {
+    blue: '201 89% 94%',   // #E2F3FD
+    green: '152 50% 92%',  // #E1F6EB
+    pink: '341 95% 95%',   // #FEEAF1
   },
 } as const;
 

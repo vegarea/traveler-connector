@@ -4,95 +4,92 @@
 
 @layer base {
   :root {
-    /* Paleta Corporativa en formato HSL */
-    --primary-purple: 252 80% 74%;    /* #9b87f5 */
-    --secondary-purple: 262 24% 54%;  /* #7E69AB */
-    --tertiary-purple: 262 29% 50%;   /* #6E59A5 */
-    --dark-purple: 222 25% 14%;       /* #1A1F2C */
-    --light-purple: 270 89% 86%;      /* #D6BCFA */
-    --vivid-purple: 263 84% 66%;      /* #8B5CF6 */
-    --soft-purple: 252 100% 93%;      /* #E5DEFF */
-
-    /* Sistema de colores basado en la paleta corporativa */
-    --background: var(--soft-purple);
-    --foreground: var(--dark-purple);
+    /* Sistema de colores basado en la paleta oficial */
+    --background: 0 0% 100%;    /* Blanco #FFFFFF */
+    --foreground: 0 0% 0%;      /* Negro #000000 */
 
     --card: 0 0% 100%;
-    --card-foreground: var(--dark-purple);
+    --card-foreground: 0 0% 0%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: var(--dark-purple);
+    --popover-foreground: 0 0% 0%;
 
-    --primary: var(--primary-purple);
-    --primary-foreground: var(--dark-purple);
+    --primary: 0 0% 0%;         /* Negro #000000 */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: var(--secondary-purple);
+    --secondary: 328 100% 48%;  /* Magenta #F4007A */
     --secondary-foreground: 0 0% 100%;
 
-    --muted: var(--soft-purple);
-    --muted-foreground: var(--tertiary-purple);
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: var(--light-purple);
-    --accent-foreground: var(--dark-purple);
+    --accent: 328 100% 48%;     /* Magenta #F4007A */
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 100%;
+    /* Colores de notificaciones */
+    --info: 201 89% 94%;        /* Azul Pastel #E2F3FD */
+    --success: 152 50% 92%;     /* Verde Pastel #E1F6EB */
+    --destructive: 341 95% 95%; /* Rosa Pastel #FEEAF1 */
+    --destructive-foreground: 0 0% 0%;
 
-    --border: var(--soft-purple);
-    --input: var(--soft-purple);
-    --ring: var(--primary-purple);
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 328 100% 48%;       /* Magenta #F4007A */
 
     --radius: 0.5rem;
 
     /* Sidebar específico */
-    --sidebar-background: var(--dark-purple);
-    --sidebar-foreground: var(--soft-purple);
-    --sidebar-primary: var(--primary-purple);
-    --sidebar-primary-foreground: var(--soft-purple);
-    --sidebar-accent: var(--tertiary-purple);
-    --sidebar-accent-foreground: var(--soft-purple);
-    --sidebar-border: var(--tertiary-purple);
-    --sidebar-ring: var(--vivid-purple);
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 0%;
+    --sidebar-primary: 328 100% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 96%;
+    --sidebar-accent-foreground: 0 0% 0%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 328 100% 48%;
   }
 
   .dark {
-    --background: var(--dark-purple);
-    --foreground: var(--soft-purple);
+    --background: 0 0% 0%;      /* Negro #000000 */
+    --foreground: 0 0% 100%;    /* Blanco #FFFFFF */
 
-    --card: var(--dark-purple);
-    --card-foreground: var(--soft-purple);
+    --card: 0 0% 0%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: var(--dark-purple);
-    --popover-foreground: var(--soft-purple);
+    --popover: 0 0% 0%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: var(--primary-purple);
-    --primary-foreground: var(--soft-purple);
+    --primary: 0 0% 100%;       /* Blanco #FFFFFF */
+    --primary-foreground: 0 0% 0%;
 
-    --secondary: var(--secondary-purple);
-    --secondary-foreground: var(--soft-purple);
+    --secondary: 328 100% 48%;  /* Magenta #F4007A */
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: var(--tertiary-purple);
-    --muted-foreground: var(--light-purple);
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 65%;
 
-    --accent: var(--tertiary-purple);
-    --accent-foreground: var(--soft-purple);
+    --accent: 328 100% 48%;     /* Magenta #F4007A */
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: var(--soft-purple);
+    /* Colores de notificaciones */
+    --info: 201 89% 94%;        /* Azul Pastel #E2F3FD */
+    --success: 152 50% 92%;     /* Verde Pastel #E1F6EB */
+    --destructive: 341 95% 95%; /* Rosa Pastel #FEEAF1 */
+    --destructive-foreground: 0 0% 100%;
 
-    --border: var(--tertiary-purple);
-    --input: var(--tertiary-purple);
-    --ring: var(--primary-purple);
+    --border: 0 0% 14%;
+    --input: 0 0% 14%;
+    --ring: 328 100% 48%;       /* Magenta #F4007A */
 
     /* Sidebar específico en modo oscuro */
-    --sidebar-background: var(--dark-purple);
-    --sidebar-foreground: var(--soft-purple);
-    --sidebar-primary: var(--vivid-purple);
-    --sidebar-primary-foreground: var(--soft-purple);
-    --sidebar-accent: var(--tertiary-purple);
-    --sidebar-accent-foreground: var(--soft-purple);
-    --sidebar-border: var(--tertiary-purple);
-    --sidebar-ring: var(--vivid-purple);
+    --sidebar-background: 0 0% 0%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 328 100% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 14%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 0 0% 14%;
+    --sidebar-ring: 328 100% 48%;
   }
 }
 
