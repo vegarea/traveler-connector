@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
+import { validateWordPressToken, syncWordPressUser } from '@/utils/wordpressAuth';
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 const WordPressCallback = () => {
   const [searchParams] = useSearchParams();
@@ -11,104 +11,56 @@ const WordPressCallback = () => {
   const [isProcessing, setIsProcessing] = useState(true);
 
   useEffect(() => {
-    const processAuth = async () => {
+    const processToken = async () => {
       try {
-        const appPassword = searchParams.get('app_password');
-        const username = searchParams.get('username');
+        const token = searchParams.get('token');
+        console.log('Token recibido:', token);
         
-        if (!appPassword || !username) {
-          console.error('Faltan credenciales de WordPress');
+        if (!token) {
+          console.error('No se recibió token');
           toast({
             title: "Error de autenticación",
-            description: "Credenciales de WordPress incompletas",
+            description: "No se recibió el token de WordPress",
             variant: "destructive",
           });
-          navigate('/login');
+          navigate('/');
           return;
         }
 
-        // Obtener la configuración de WordPress
-        const { data: wpConfig, error: configError } = await supabase
-          .from('wordpress_config')
-          .select('wp_url')
-          .single();
-
-        if (configError || !wpConfig?.wp_url) {
-          console.error('Error al obtener configuración de WordPress:', configError);
-          throw new Error('Error de configuración');
+        // Validar el token
+        console.log('Intentando validar token...');
+        const payload = await validateWordPressToken(token);
+        console.log('Resultado de validación:', payload);
+        
+        if (!payload) {
+          console.error('Token inválido');
+          toast({
+            title: "Error de autenticación",
+            description: "Token de WordPress inválido",
+            variant: "destructive",
+          });
+          navigate('/');
+          return;
         }
 
-        // Validar las credenciales contra WordPress
-        const response = await fetch(`${wpConfig.wp_url}/wp-json/wp/v2/users/me`, {
-          headers: {
-            'Authorization': `Basic ${btoa(`${username}:${appPassword}`)}`,
-          },
-        });
-
-        if (!response.ok) {
-          console.error('Error validando credenciales:', await response.text());
-          throw new Error('Credenciales inválidas');
+        // Sincronizar usuario
+        console.log('Intentando sincronizar usuario:', payload);
+        const user = await syncWordPressUser(payload);
+        console.log('Resultado de sincronización:', user);
+        
+        if (!user) {
+          console.error('Error en sincronización de usuario');
+          toast({
+            title: "Error",
+            description: "No se pudo sincronizar el usuario",
+            variant: "destructive",
+          });
+          navigate('/');
+          return;
         }
 
-        const wpUser = await response.json();
-
-        // Crear o actualizar usuario en Supabase
-        const { data: existingUser, error: userError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('wordpress_user_id', wpUser.id)
-          .single();
-
-        if (userError && userError.code !== 'PGRST116') {
-          console.error('Error al buscar usuario:', userError);
-          throw new Error('Error de base de datos');
-        }
-
-        const userData = {
-          wordpress_user_id: wpUser.id,
-          username: wpUser.slug,
-          email: wpUser.email,
-          avatar_url: wpUser.avatar_urls['96'],
-          wp_auth_token: appPassword,
-          wp_auth_token_expiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 días
-          account_status: 'active',
-          email_verified: true,
-        };
-
-        let user;
-        if (existingUser) {
-          const { data: updatedUser, error: updateError } = await supabase
-            .from('users')
-            .update(userData)
-            .eq('id', existingUser.id)
-            .select()
-            .single();
-
-          if (updateError) {
-            console.error('Error actualizando usuario:', updateError);
-            throw new Error('Error actualizando usuario');
-          }
-          user = updatedUser;
-        } else {
-          const { data: newUser, error: createError } = await supabase
-            .from('users')
-            .insert(userData)
-            .select()
-            .single();
-
-          if (createError) {
-            console.error('Error creando usuario:', createError);
-            throw new Error('Error creando usuario');
-          }
-          user = newUser;
-        }
-
-        // Guardar información en localStorage
-        localStorage.setItem('wp_auth', JSON.stringify({
-          username,
-          token: appPassword,
-          user_id: wpUser.id
-        }));
+        // Guardar token y datos de usuario
+        localStorage.setItem('wp_token', token);
         localStorage.setItem('user', JSON.stringify(user));
 
         toast({
@@ -117,22 +69,22 @@ const WordPressCallback = () => {
         });
 
         // Redirigir al perfil del usuario
+        console.log('Redirigiendo a perfil:', `/u/${user.username}`);
         navigate(`/u/${user.username}`);
-
       } catch (error) {
-        console.error('Error procesando autenticación:', error);
+        console.error('Error procesando token de WordPress:', error);
         toast({
           title: "Error",
-          description: "No se pudo completar la autenticación",
+          description: "Ocurrió un error al procesar la autenticación",
           variant: "destructive",
         });
-        navigate('/login');
+        navigate('/');
       } finally {
         setIsProcessing(false);
       }
     };
 
-    processAuth();
+    processToken();
   }, [searchParams, navigate, toast]);
 
   if (isProcessing) {
