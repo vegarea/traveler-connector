@@ -52,11 +52,27 @@ export const TestUserCreationForm = () => {
 
     try {
       console.log('Creando usuario en WordPress...');
+      
+      // Primero obtenemos un token nonce para la creación de usuarios
+      const nonceResponse = await fetch(`${wpConfig.wp_url}/wp-json/wp/v2/users/me`, {
+        headers: {
+          'Authorization': `Basic ${btoa(`${wpConfig.wp_username}:${wpConfig.wp_token}`)}`,
+        }
+      });
+
+      if (!nonceResponse.ok) {
+        const nonceError = await nonceResponse.text();
+        console.error('Error al obtener nonce:', nonceError);
+        throw new Error('No se pudo autenticar con WordPress');
+      }
+
+      // Ahora creamos el usuario con el token de autenticación
       const response = await fetch(`${wpConfig.wp_url}/wp-json/wp/v2/users`, {
         method: 'POST',
         headers: {
           'Authorization': `Basic ${btoa(`${wpConfig.wp_username}:${wpConfig.wp_token}`)}`,
           'Content-Type': 'application/json',
+          'X-WP-Nonce': nonceResponse.headers.get('X-WP-Nonce') || '',
         },
         body: JSON.stringify({
           username: values.username,
