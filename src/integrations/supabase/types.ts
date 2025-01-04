@@ -189,31 +189,40 @@ export type Database = {
       }
       users: {
         Row: {
+          account_status: string
           avatar_url: string | null
           cover_url: string | null
           created_at: string
           email: string
+          email_verified: boolean
           id: string
+          last_login_date: string | null
           updated_at: string
           username: string
           wordpress_user_id: number
         }
         Insert: {
+          account_status?: string
           avatar_url?: string | null
           cover_url?: string | null
           created_at?: string
           email: string
+          email_verified?: boolean
           id?: string
+          last_login_date?: string | null
           updated_at?: string
           username: string
           wordpress_user_id: number
         }
         Update: {
+          account_status?: string
           avatar_url?: string | null
           cover_url?: string | null
           created_at?: string
           email?: string
+          email_verified?: boolean
           id?: string
+          last_login_date?: string | null
           updated_at?: string
           username?: string
           wordpress_user_id?: number
