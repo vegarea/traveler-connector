@@ -49,12 +49,12 @@ const LogoUploader: React.FC<LogoUploaderProps> = ({
         return;
       }
 
-      const { data: roles, error: rolesError } = await supabase
+      const { data: role, error: rolesError } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', user.id)
         .eq('role', 'admin')
-        .single();
+        .maybeSingle();
 
       if (rolesError) {
         console.error('Error checking admin status:', rolesError);
@@ -62,7 +62,7 @@ const LogoUploader: React.FC<LogoUploaderProps> = ({
         return;
       }
 
-      setIsAdmin(!!roles);
+      setIsAdmin(!!role);
     } catch (error) {
       console.error('Error checking admin status:', error);
       setIsAdmin(false);
