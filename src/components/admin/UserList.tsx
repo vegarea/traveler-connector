@@ -15,8 +15,26 @@ import { supabase } from "@/integrations/supabase/client";
 import { Check, X, Mail, CheckCircle } from "lucide-react";
 import { format } from "date-fns";
 
+interface UserRole {
+  role: 'admin' | 'user';
+}
+
+interface User {
+  id: string;
+  wordpress_user_id: number;
+  username: string;
+  email: string;
+  avatar_url: string | null;
+  created_at: string;
+  updated_at: string;
+  last_login_date: string | null;
+  account_status: string;
+  email_verified: boolean;
+  user_roles?: UserRole[];
+}
+
 export const UserList = () => {
-  const { data: users, isLoading } = useQuery({
+  const { data: users, isLoading } = useQuery<User[]>({
     queryKey: ['users'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -45,7 +63,7 @@ export const UserList = () => {
     }
   };
 
-  const getRoleBadge = (role: string) => {
+  const getRoleBadge = (role: 'admin' | 'user') => {
     switch (role) {
       case 'admin':
         return <Badge variant="destructive">Admin</Badge>;
