@@ -22,7 +22,7 @@ const DashboardCard = ({
           <h3 className="text-2xl font-bold mt-2">{value}</h3>
           <p className={cn(
             "text-sm mt-1",
-            change > 0 ? "text-green-600" : "text-red-600"
+            change > 0 ? "text-[#F4007A]" : "text-destructive"
           )}>
             {change > 0 ? "+" : ""}{change}%
           </p>

@@ -8,7 +8,7 @@ interface LogoutButtonProps {
 
 export const LogoutButton = ({ onLogout }: LogoutButtonProps) => {
   return (
-    <div className="p-4 border-t bg-gradient-to-br from-purple-600/5 to-blue-600/5 dark:from-gray-800 dark:to-gray-900">
+    <div className="p-4 border-t bg-gradient-to-br from-[#F4007A]/5 to-[#F4007A]/5 dark:from-gray-800 dark:to-gray-900">
       <button
         onClick={onLogout}
         className={cn(
