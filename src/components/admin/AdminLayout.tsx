@@ -111,13 +111,13 @@ const AdminLayout = () => {
   };
 
   return (
-    <div className="flex h-screen w-full bg-[#F8FAFC]">
-      {/* Sidebar */}
-      <aside className="w-72 flex flex-col bg-white border-r border-slate-200 shadow-lg">
+    <div className="flex h-screen w-full bg-gradient-to-br from-slate-50 to-slate-100">
+      {/* Sidebar con gradiente sutil y sombra mejorada */}
+      <aside className="w-72 flex flex-col bg-gradient-to-b from-white to-slate-50 border-r border-slate-200 shadow-[2px_0_8px_rgba(0,0,0,0.05)]">
         <nav className="h-full flex flex-col">
           <SidebarHeader headerLogo={headerLogo} isCollapsed={false} />
           
-          {/* Menu Items */}
+          {/* Menu Items con mejor espaciado */}
           <div className="flex-1 overflow-y-auto py-6 px-4 space-y-1">
             {menuItems.map((item) => (
               <SidebarMenuItem
@@ -134,8 +134,8 @@ const AdminLayout = () => {
         </nav>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100">
+      {/* Main Content con gradiente y sombra interna */}
+      <main className="flex-1 flex flex-col overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-100">
         <div className="flex-1 overflow-y-auto">
           <div className="p-8 max-w-7xl mx-auto w-full space-y-6">
             <Outlet />
