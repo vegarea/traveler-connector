@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { getJWTToken } from "../permissions/utils/wordpressApi";
 
 const testUserSchema = z.object({
   username: z.string().min(3, "El nombre de usuario debe tener al menos 3 caracteres"),
@@ -50,32 +51,52 @@ export const TestUserCreationForm = () => {
       throw new Error('WordPress configuration is missing');
     }
 
-    console.log('Creating WordPress user...');
-    const response = await fetch(`${wpConfig.wp_url}/wp-json/wp/v2/users`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Basic ${btoa(`${wpConfig.wp_username}:${wpConfig.wp_token}`)}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: values.username,
-        email: values.email,
-        password: values.password,
-        roles: ['subscriber'],
-      }),
-    });
+    try {
+      console.log('Obteniendo token JWT para crear usuario...');
+      const jwtResponse = await getJWTToken(
+        wpConfig.wp_url,
+        wpConfig.wp_username,
+        wpConfig.wp_token
+      );
+      console.log('Token JWT obtenido:', jwtResponse);
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('WordPress API Error:', errorData);
-      throw new Error(errorData.message || 'Error creating WordPress user');
+      console.log('Creando usuario en WordPress...');
+      const response = await fetch(`${wpConfig.wp_url}/wp-json/wp/v2/users`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${jwtResponse.token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: values.username,
+          email: values.email,
+          password: values.password,
+          roles: ['subscriber'],
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response from WordPress:', errorText);
+        try {
+          const errorData = JSON.parse(errorText);
+          throw new Error(errorData.message || 'Error creating WordPress user');
+        } catch (e) {
+          throw new Error(`Error creating WordPress user: ${errorText}`);
+        }
+      }
+
+      const userData = await response.json();
+      console.log('Usuario creado en WordPress:', userData);
+      return userData;
+    } catch (error) {
+      console.error('Error detallado:', error);
+      throw error;
     }
-
-    return await response.json();
   };
 
   const createLocalUser = async (values: TestUserFormValues, wpUserId: number) => {
-    console.log('Creating local user...');
+    console.log('Creando usuario local...');
     const { error } = await supabase
       .from('users')
       .insert({
@@ -87,7 +108,7 @@ export const TestUserCreationForm = () => {
       });
 
     if (error) {
-      console.error('Supabase Error:', error);
+      console.error('Error Supabase:', error);
       throw error;
     }
   };
@@ -96,7 +117,7 @@ export const TestUserCreationForm = () => {
     try {
       // 1. Crear usuario en WordPress
       const wpUser = await createWordPressUser(values);
-      console.log('WordPress user created:', wpUser);
+      console.log('Usuario WordPress creado:', wpUser);
 
       // 2. Crear usuario en nuestra base de datos
       await createLocalUser(values, wpUser.id);
