@@ -1,53 +1,38 @@
 /**
- * Primary Colors
- * These are the main brand colors used throughout the application
+ * Corporate Color Palette
+ * These are the official brand colors defined in /admin/settings/style
  */
-export const PRIMARY_COLORS = {
-  BLACK: '#000000',
-  WHITE: '#FFFFFF',
+export const CORPORATE_COLORS = {
+  PRIMARY_PURPLE: '#9b87f5',
+  SECONDARY_PURPLE: '#7E69AB',
+  TERTIARY_PURPLE: '#6E59A5',
+  DARK_PURPLE: '#1A1F2C',
+  LIGHT_PURPLE: '#D6BCFA',
+  VIVID_PURPLE: '#8B5CF6',
+  SOFT_PURPLE: '#E5DEFF',
 } as const;
 
 /**
- * Secondary Color
- * Used for interactive elements like buttons, links, and hover states
- */
-export const SECONDARY_COLOR = '#F4007A' as const;
-
-/**
- * Pastel Colors
- * Used for notifications, alerts, and status indicators
- */
-export const PASTEL_COLORS = {
-  // Info notifications
-  INFO: '#E2F3FD',
-  // Success notifications
-  SUCCESS: '#E1F6EB',
-  // Error or warning notifications
-  ERROR: '#FEEAF1',
-} as const;
-
-/**
- * Tailwind CSS color values in HSL format
- * These values can be used in the tailwind.config.ts file
+ * HSL Values for Tailwind CSS
+ * These are the HSL equivalents of our corporate colors
  */
 export const TAILWIND_COLORS = {
   primary: {
-    black: '0 0% 0%',      // #000000
-    white: '0 0% 100%',    // #FFFFFF
-  },
-  secondary: '332 100% 48%',  // #F4007A
-  pastel: {
-    info: '204 89% 94%',    // #E2F3FD
-    success: '151 50% 92%',  // #E1F6EB
-    error: '341 95% 96%',    // #FEEAF1
+    purple: '252 80% 74%',    // #9b87f5
+    secondary: '262 24% 54%', // #7E69AB
+    tertiary: '262 29% 50%',  // #6E59A5
+    dark: '222 25% 14%',      // #1A1F2C
+    light: '270 89% 86%',     // #D6BCFA
+    vivid: '263 84% 66%',     // #8B5CF6
+    soft: '252 100% 93%',     // #E5DEFF
   },
 } as const;
 
 /**
  * Get color with opacity
- * @param hex - Hex color code
+ * @param hex - Hex color code from CORPORATE_COLORS
  * @param opacity - Opacity value between 0 and 1
- * @returns - RGB color with opacity
+ * @returns - RGBA color string
  */
 export const getColorWithOpacity = (hex: string, opacity: number): string => {
   const r = parseInt(hex.slice(1, 3), 16);
