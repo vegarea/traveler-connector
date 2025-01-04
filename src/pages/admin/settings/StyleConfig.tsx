@@ -10,8 +10,6 @@ interface LogoConfig {
   type: string;
   url: string;
   alt_text?: string;
-  width?: number;
-  height?: number;
 }
 
 const StyleConfig = () => {
@@ -49,8 +47,6 @@ const StyleConfig = () => {
         .update({
           url: logoData.url,
           alt_text: logoData.alt_text,
-          width: logoData.width,
-          height: logoData.height,
         })
         .eq('id', existingLogo.id);
 
@@ -66,8 +62,6 @@ const StyleConfig = () => {
           type,
           url: logoData.url,
           alt_text: logoData.alt_text,
-          width: logoData.width,
-          height: logoData.height,
         });
 
       if (error) {

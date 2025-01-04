@@ -13,14 +13,10 @@ interface LogoUploaderProps {
   currentLogo?: {
     url: string;
     alt_text?: string;
-    width?: number;
-    height?: number;
   };
   onUploadSuccess: (logoData: {
     url: string;
     alt_text?: string;
-    width?: number;
-    height?: number;
   }) => void;
 }
 
@@ -34,8 +30,8 @@ const LogoUploader: React.FC<LogoUploaderProps> = ({
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
   const [altText, setAltText] = useState(currentLogo?.alt_text || '');
-  const [width, setWidth] = useState(currentLogo?.width?.toString() || '');
-  const [height, setHeight] = useState(currentLogo?.height?.toString() || '');
+  const [previewUrl, setPreviewUrl] = useState(currentLogo?.url || '');
+  const [hasChanges, setHasChanges] = useState(false);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -58,18 +54,8 @@ const LogoUploader: React.FC<LogoUploaderProps> = ({
         .from('logos')
         .getPublicUrl(fileName);
 
-      // Call the success callback with the new logo data
-      onUploadSuccess({
-        url: publicUrl,
-        alt_text: altText,
-        width: width ? parseInt(width) : undefined,
-        height: height ? parseInt(height) : undefined,
-      });
-
-      toast({
-        title: "Logo actualizado",
-        description: "El logo se ha actualizado correctamente",
-      });
+      setPreviewUrl(publicUrl);
+      setHasChanges(true);
     } catch (error) {
       console.error('Error uploading logo:', error);
       toast({
@@ -82,6 +68,21 @@ const LogoUploader: React.FC<LogoUploaderProps> = ({
     }
   };
 
+  const handleSave = () => {
+    if (!previewUrl) return;
+
+    onUploadSuccess({
+      url: previewUrl,
+      alt_text: altText,
+    });
+
+    setHasChanges(false);
+    toast({
+      title: "Logo guardado",
+      description: "El logo se ha guardado correctamente",
+    });
+  };
+
   return (
     <div className="space-y-4">
       <div>
@@ -89,11 +90,11 @@ const LogoUploader: React.FC<LogoUploaderProps> = ({
         <p className="text-sm text-muted-foreground">{description}</p>
       </div>
 
-      {currentLogo?.url && (
+      {previewUrl && (
         <div className="relative w-full max-w-md border rounded-lg p-4">
           <img
-            src={currentLogo.url}
-            alt={currentLogo.alt_text || title}
+            src={previewUrl}
+            alt={altText || title}
             className="max-w-full h-auto"
           />
         </div>
@@ -118,33 +119,30 @@ const LogoUploader: React.FC<LogoUploaderProps> = ({
           <Input
             id={`${type}-alt`}
             value={altText}
-            onChange={(e) => setAltText(e.target.value)}
+            onChange={(e) => {
+              setAltText(e.target.value);
+              setHasChanges(true);
+            }}
             placeholder="Descripción del logo para accesibilidad"
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor={`${type}-width`}>Ancho (px)</Label>
-            <Input
-              id={`${type}-width`}
-              type="number"
-              value={width}
-              onChange={(e) => setWidth(e.target.value)}
-              placeholder="Auto"
-            />
-          </div>
-          <div>
-            <Label htmlFor={`${type}-height`}>Alto (px)</Label>
-            <Input
-              id={`${type}-height`}
-              type="number"
-              value={height}
-              onChange={(e) => setHeight(e.target.value)}
-              placeholder="Auto"
-            />
-          </div>
-        </div>
+        {hasChanges && (
+          <Button
+            onClick={handleSave}
+            className="w-full sm:w-auto"
+            disabled={isUploading}
+          >
+            {isUploading ? (
+              "Subiendo..."
+            ) : (
+              <>
+                <Check className="w-4 h-4 mr-2" />
+                Guardar cambios
+              </>
+            )}
+          </Button>
+        )}
       </div>
     </div>
   );
