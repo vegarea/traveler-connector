@@ -111,9 +111,9 @@ const AdminLayout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="flex h-screen w-full">
       {/* Sidebar */}
-      <aside className="w-72 flex flex-col bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-purple-100 dark:border-gray-800">
+      <aside className="w-72 flex-shrink-0 flex flex-col bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-purple-100 dark:border-gray-800">
         <nav className="h-full flex flex-col">
           <SidebarHeader headerLogo={headerLogo} />
           
@@ -136,7 +136,7 @@ const AdminLayout = () => {
       {/* Main Content */}
       <main className="flex-1 overflow-hidden bg-gradient-to-br from-white to-purple-50 dark:from-gray-900 dark:to-gray-800">
         <div className="h-full overflow-y-auto p-8">
-          <div className="max-w-[2000px] mx-auto">
+          <div className="w-full">
             <Outlet />
           </div>
         </div>
