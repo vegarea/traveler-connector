@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Image, Upload, Check } from "lucide-react";
+import { Image, Upload, Check, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface LogoUploaderProps {
   type: string;
@@ -32,6 +33,27 @@ const LogoUploader: React.FC<LogoUploaderProps> = ({
   const [altText, setAltText] = useState(currentLogo?.alt_text || '');
   const [previewUrl, setPreviewUrl] = useState(currentLogo?.url || '');
   const [hasChanges, setHasChanges] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    checkAdminStatus();
+  }, []);
+
+  const checkAdminStatus = async () => {
+    try {
+      const { data: roles, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('role', 'admin');
+
+      if (rolesError) throw rolesError;
+      setIsAdmin(roles && roles.length > 0);
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+      setIsAdmin(false);
+    }
+  };
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -39,6 +61,7 @@ const LogoUploader: React.FC<LogoUploaderProps> = ({
 
     try {
       setIsUploading(true);
+      setError(null);
 
       // Upload file to Supabase Storage
       const fileExt = file.name.split('.').pop();
@@ -56,8 +79,9 @@ const LogoUploader: React.FC<LogoUploaderProps> = ({
 
       setPreviewUrl(publicUrl);
       setHasChanges(true);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading logo:', error);
+      setError(error.message || 'Error al subir el logo');
       toast({
         title: "Error",
         description: "No se pudo subir el logo. Por favor, inténtalo de nuevo.",
@@ -83,12 +107,30 @@ const LogoUploader: React.FC<LogoUploaderProps> = ({
     });
   };
 
+  if (!isAdmin) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          No tienes permisos para gestionar los logos. Contacta con un administrador.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <div>
         <h3 className="text-lg font-semibold">{title}</h3>
         <p className="text-sm text-muted-foreground">{description}</p>
       </div>
+
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
       {previewUrl && (
         <div className="relative w-full max-w-md border rounded-lg p-4">
