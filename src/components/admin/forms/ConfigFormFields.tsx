@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { UseFormReturn } from "react-hook-form";
@@ -25,6 +25,9 @@ export const ConfigFormFields = ({ form }: ConfigFormFieldsProps) => {
                 className="bg-white/70 border-slate-200 focus:border-[#F4007A]/30 focus:ring-[#F4007A]/10 transition-all duration-200"
               />
             </FormControl>
+            <FormDescription>
+              La URL base de tu sitio WordPress (sin /wp-json)
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )}
@@ -43,6 +46,9 @@ export const ConfigFormFields = ({ form }: ConfigFormFieldsProps) => {
                 className="bg-white/70 border-slate-200 focus:border-[#F4007A]/30 focus:ring-[#F4007A]/10 transition-all duration-200"
               />
             </FormControl>
+            <FormDescription>
+              Usuario con permisos de administrador en WordPress
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )}
@@ -62,6 +68,9 @@ export const ConfigFormFields = ({ form }: ConfigFormFieldsProps) => {
                 className="bg-white/70 border-slate-200 focus:border-[#F4007A]/30 focus:ring-[#F4007A]/10 transition-all duration-200"
               />
             </FormControl>
+            <FormDescription>
+              Token de aplicación generado en WordPress
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )}
@@ -75,11 +84,13 @@ export const ConfigFormFields = ({ form }: ConfigFormFieldsProps) => {
             <FormLabel className="text-slate-700">URL de Callback</FormLabel>
             <FormControl>
               <Input 
-                placeholder="https://preview--traveler-connector.lovable.app/auth/wordpress/callback" 
                 {...field} 
                 className="bg-white/70 border-slate-200 focus:border-[#F4007A]/30 focus:ring-[#F4007A]/10 transition-all duration-200"
               />
             </FormControl>
+            <FormDescription>
+              URL donde WordPress redirigirá después del login (automáticamente configurada)
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )}
@@ -93,11 +104,13 @@ export const ConfigFormFields = ({ form }: ConfigFormFieldsProps) => {
             <FormLabel className="text-slate-700">URL de la Aplicación</FormLabel>
             <FormControl>
               <Input 
-                placeholder="https://preview--traveler-connector.lovable.app" 
                 {...field} 
                 className="bg-white/70 border-slate-200 focus:border-[#F4007A]/30 focus:ring-[#F4007A]/10 transition-all duration-200"
               />
             </FormControl>
+            <FormDescription>
+              URL base de esta aplicación (automáticamente configurada)
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )}
