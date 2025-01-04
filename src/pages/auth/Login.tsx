@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useWordPressConfig } from '@/components/wordpress/hooks/useWordPressConfig';
-import { getJWTToken } from '@/components/admin/permissions/utils/wordpressApi';
+import { getJWTToken, validateJWTToken } from '@/components/admin/permissions/utils/wordpressApi';
 import { Loader2 } from "lucide-react";
 
 const loginSchema = z.object({
@@ -54,13 +54,32 @@ const Login = () => {
       console.log('Respuesta de login:', response);
 
       if (response.token) {
+        // Validar el token
+        console.log('Validando token JWT...');
+        const validationResponse = await validateJWTToken(wpConfig.wp_url, response.token);
+        console.log('Respuesta de validación:', validationResponse);
+
         // Guardar el token
         localStorage.setItem('wp_token', response.token);
         
-        // Redirigir a WordPress
-        const wpLoginUrl = `${wpConfig.wp_url}/wp-login.php?token=${response.token}`;
-        console.log('Redirigiendo a:', wpLoginUrl);
-        window.location.href = wpLoginUrl;
+        // Redirigir directamente al home de WordPress
+        const wpHomeUrl = `${wpConfig.wp_url}/wp-admin/profile.php`;
+        console.log('Redirigiendo a:', wpHomeUrl);
+        
+        // Crear un formulario oculto para enviar el token como POST
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = wpHomeUrl;
+        form.style.display = 'none';
+
+        const tokenInput = document.createElement('input');
+        tokenInput.type = 'hidden';
+        tokenInput.name = 'jwt_token';
+        tokenInput.value = response.token;
+        form.appendChild(tokenInput);
+
+        document.body.appendChild(form);
+        form.submit();
       }
     } catch (error) {
       console.error('Error en login:', error);
