@@ -235,6 +235,8 @@ export type Database = {
           updated_at: string
           username: string
           wordpress_user_id: number
+          wp_auth_token: string | null
+          wp_auth_token_expiry: string | null
         }
         Insert: {
           account_status?: string
@@ -248,6 +250,8 @@ export type Database = {
           updated_at?: string
           username: string
           wordpress_user_id: number
+          wp_auth_token?: string | null
+          wp_auth_token_expiry?: string | null
         }
         Update: {
           account_status?: string
@@ -261,6 +265,8 @@ export type Database = {
           updated_at?: string
           username?: string
           wordpress_user_id?: number
+          wp_auth_token?: string | null
+          wp_auth_token_expiry?: string | null
         }
         Relationships: []
       }
@@ -305,6 +311,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      account_status: "active" | "inactive" | "pending"
       app_role: "admin" | "user"
       profile_type: "traveler" | "premium" | "agency" | "expert"
     }
