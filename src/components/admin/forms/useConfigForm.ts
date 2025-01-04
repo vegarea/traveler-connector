@@ -3,10 +3,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { configSchema, ConfigFormValues } from './types';
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export const useConfigForm = () => {
   const { toast } = useToast();
+  const [isConnected, setIsConnected] = useState(false);
   
   const form = useForm<ConfigFormValues>({
     resolver: zodResolver(configSchema),
@@ -45,27 +46,32 @@ export const useConfigForm = () => {
           auth_callback_url: config.auth_callback_url || window.location.origin + '/auth/wordpress/callback',
           app_url: config.app_url || window.location.origin,
         });
+        
+        // Test connection when config is loaded
+        testConnection(config);
       }
     };
 
     loadConfig();
   }, [form]);
 
-  const testConnection = async (values: ConfigFormValues) => {
+  const testConnection = async (values?: ConfigFormValues) => {
     try {
+      const configToTest = values || form.getValues();
+      
       // Eliminar espacios en blanco del token
-      const cleanToken = values.wp_token.replace(/\s+/g, '');
+      const cleanToken = configToTest.wp_token.replace(/\s+/g, '');
       
       // First try to get the nonce
-      const baseResponse = await fetch(`${values.wp_url}/wp-json`);
+      const baseResponse = await fetch(`${configToTest.wp_url}/wp-json`);
       if (!baseResponse.ok) {
         throw new Error('No se pudo conectar con WordPress');
       }
 
       // Then try to authenticate with username:password
-      const response = await fetch(`${values.wp_url}/wp-json/wp/v2/users/me`, {
+      const response = await fetch(`${configToTest.wp_url}/wp-json/wp/v2/users/me`, {
         headers: {
-          'Authorization': `Basic ${btoa(`${values.wp_username}:${cleanToken}`)}`,
+          'Authorization': `Basic ${btoa(`${configToTest.wp_username}:${cleanToken}`)}`,
           'Content-Type': 'application/json',
         },
       });
@@ -76,6 +82,7 @@ export const useConfigForm = () => {
       }
 
       const data = await response.json();
+      setIsConnected(true);
       
       toast({
         title: "Conexión exitosa",
@@ -85,6 +92,7 @@ export const useConfigForm = () => {
       return true;
     } catch (error) {
       console.error('Error testing WordPress connection:', error);
+      setIsConnected(false);
       toast({
         title: "Error de conexión",
         description: "No se pudo conectar con WordPress. Verifica el usuario y el token de aplicación.",
@@ -145,5 +153,6 @@ export const useConfigForm = () => {
     form,
     onSubmit,
     testConnection: () => testConnection(form.getValues()),
+    isConnected,
   };
 };
