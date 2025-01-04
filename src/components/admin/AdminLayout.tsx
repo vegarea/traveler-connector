@@ -162,9 +162,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
-        <div className="container py-6">
-          {children}
-        </div>
+        {children}
       </main>
     </div>
   );
