@@ -23,7 +23,7 @@ const WordPressCallback = () => {
             description: "No se recibió el token de WordPress",
             variant: "destructive",
           });
-          navigate('/');
+          navigate('/admin/settings/wordpress');
           return;
         }
 
@@ -39,7 +39,7 @@ const WordPressCallback = () => {
             description: "Token de WordPress inválido",
             variant: "destructive",
           });
-          navigate('/');
+          navigate('/admin/settings/wordpress');
           return;
         }
 
@@ -55,7 +55,7 @@ const WordPressCallback = () => {
             description: "No se pudo sincronizar el usuario",
             variant: "destructive",
           });
-          navigate('/');
+          navigate('/admin/settings/wordpress');
           return;
         }
 
@@ -68,9 +68,8 @@ const WordPressCallback = () => {
           description: "Has iniciado sesión correctamente",
         });
 
-        // Redirigir al perfil del usuario
-        console.log('Redirigiendo a perfil:', `/u/${user.username}`);
-        navigate(`/u/${user.username}`);
+        // Redirigir al dashboard
+        navigate('/admin');
       } catch (error) {
         console.error('Error procesando token de WordPress:', error);
         toast({
@@ -78,7 +77,7 @@ const WordPressCallback = () => {
           description: "Ocurrió un error al procesar la autenticación",
           variant: "destructive",
         });
-        navigate('/');
+        navigate('/admin/settings/wordpress');
       } finally {
         setIsProcessing(false);
       }

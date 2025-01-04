@@ -6,6 +6,31 @@ interface WordPressTokenPayload {
   user_id: number;
 }
 
+export const generateWordPressLoginUrl = async (): Promise<string> => {
+  try {
+    // Obtener la configuración de WordPress
+    const { data: wpConfig, error: configError } = await supabase
+      .from('wordpress_config')
+      .select('wp_url, auth_callback_url')
+      .single();
+
+    if (configError || !wpConfig?.wp_url) {
+      console.error('Error al obtener configuración de WordPress:', configError);
+      throw new Error('No se pudo obtener la configuración de WordPress');
+    }
+
+    // Construir la URL de login
+    const loginUrl = new URL(`${wpConfig.wp_url}/wp-json/jwt-auth/v1/auth-redirect`);
+    loginUrl.searchParams.append('redirect_url', wpConfig.auth_callback_url || window.location.origin + '/auth/wordpress/callback');
+    
+    console.log('URL de login generada:', loginUrl.toString());
+    return loginUrl.toString();
+  } catch (error) {
+    console.error('Error al generar URL de login:', error);
+    throw error;
+  }
+};
+
 export const validateWordPressToken = async (token: string): Promise<WordPressTokenPayload | null> => {
   try {
     console.log('Iniciando validación de token de WordPress...');
