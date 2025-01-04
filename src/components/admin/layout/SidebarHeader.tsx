@@ -3,20 +3,28 @@ import { cn } from "@/lib/utils";
 
 interface SidebarHeaderProps {
   headerLogo: { url: string; alt_text?: string } | null;
+  isCollapsed: boolean;
 }
 
-export const SidebarHeader = ({ headerLogo }: SidebarHeaderProps) => {
+export const SidebarHeader = ({ headerLogo, isCollapsed }: SidebarHeaderProps) => {
   return (
-    <div className="p-6 border-b bg-gradient-to-br from-[#F4007A]/10 to-[#F4007A]/5 dark:from-gray-800 dark:to-gray-900">
+    <div className="p-6 border-b border-sidebar-border bg-gradient-to-br from-[#F4007A]/5 to-transparent">
       {headerLogo ? (
         <img 
           src={headerLogo.url} 
           alt={headerLogo.alt_text || "Logo"} 
-          className="h-8 object-contain"
+          className={cn(
+            "object-contain transition-all duration-300",
+            isCollapsed ? "h-8 w-8" : "h-8"
+          )}
         />
       ) : (
-        <h2 className="text-xl font-semibold bg-gradient-to-r from-[#F4007A] to-[#F4007A]/80 bg-clip-text text-transparent">
-          Panel Admin
+        <h2 className={cn(
+          "font-semibold transition-all duration-300",
+          "bg-gradient-to-r from-[#F4007A] to-[#F4007A]/80 bg-clip-text text-transparent",
+          isCollapsed ? "text-lg" : "text-xl"
+        )}>
+          {isCollapsed ? "PA" : "Panel Admin"}
         </h2>
       )}
     </div>
