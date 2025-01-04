@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Users, Activity, MessageSquare, UserCheck } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const DashboardCard = ({ 
   title, 
