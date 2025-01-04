@@ -3,14 +3,12 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { validateWordPressToken, syncWordPressUser } from '@/utils/wordpressAuth';
 import { useToast } from "@/hooks/use-toast";
-import { useWordPressConfig } from '@/components/wordpress/hooks/useWordPressConfig';
 
 const WordPressCallback = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(true);
-  const { data: wpConfig } = useWordPressConfig();
 
   useEffect(() => {
     const processToken = async () => {
@@ -60,21 +58,8 @@ const WordPressCallback = () => {
           description: "Has iniciado sesión correctamente",
         });
 
-        // Determinar la URL de redirección
-        let redirectUrl = '/'; // Por defecto, redirige al home
-
-        // Si estamos en desarrollo, redirige al perfil del usuario
-        if (import.meta.env.DEV) {
-          redirectUrl = `/u/${user.username}`;
-        }
-
-        // Si hay una URL de redirección configurada en WordPress, úsala
-        if (wpConfig?.login_redirect_url) {
-          redirectUrl = wpConfig.login_redirect_url;
-        }
-
-        // Redirigir al usuario
-        navigate(redirectUrl);
+        // Redirigir al perfil del usuario
+        navigate(`/u/${user.username}`);
       } catch (error) {
         console.error('Error processing WordPress token:', error);
         toast({
@@ -89,7 +74,7 @@ const WordPressCallback = () => {
     };
 
     processToken();
-  }, [searchParams, navigate, toast, wpConfig]);
+  }, [searchParams, navigate, toast]);
 
   if (isProcessing) {
     return (
