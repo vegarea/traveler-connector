@@ -133,6 +133,16 @@ const StyleConfig = () => {
                     <p className="text-sm text-center">Rosa Pastel (#FEEAF1)</p>
                     <p className="text-xs text-center text-muted-foreground">Notificaciones Error</p>
                   </div>
+                  <div className="space-y-2">
+                    <div className="h-20 rounded-md" style={{ backgroundColor: '#FEC6A1' }}></div>
+                    <p className="text-sm text-center">Naranja Pastel (#FEC6A1)</p>
+                    <p className="text-xs text-center text-muted-foreground">Notificaciones Warning</p>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-20 rounded-md" style={{ backgroundColor: '#D3E4FD' }}></div>
+                    <p className="text-sm text-center">Azul Claro Pastel (#D3E4FD)</p>
+                    <p className="text-xs text-center text-muted-foreground">Estados Inactivos</p>
+                  </div>
                 </div>
               </div>
             </CardContent>
