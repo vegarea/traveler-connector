@@ -1,40 +1,19 @@
 import React from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-
-const testUserSchema = z.object({
-  username: z.string().min(3, "El nombre de usuario debe tener al menos 3 caracteres"),
-  email: z.string().email("Ingresa un email válido"),
-  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
-});
-
-type TestUserFormValues = z.infer<typeof testUserSchema>;
+import { testUserSchema, TestUserFormValues } from './wordpress/types';
+import { useWordPressUser } from './wordpress/useWordPressUser';
+import { useLocalUser } from './wordpress/useLocalUser';
 
 export const TestUserCreationForm = () => {
   const { toast } = useToast();
-
-  // Obtener la configuración de WordPress
-  const { data: wpConfig } = useQuery({
-    queryKey: ['wordpress-config'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('wordpress_config')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(1);
-
-      if (error) throw error;
-      return data[0];
-    }
-  });
+  const { createWordPressUser } = useWordPressUser();
+  const { createLocalUser } = useLocalUser();
 
   const form = useForm<TestUserFormValues>({
     resolver: zodResolver(testUserSchema),
@@ -44,82 +23,6 @@ export const TestUserCreationForm = () => {
       password: "",
     },
   });
-
-  const createWordPressUser = async (values: TestUserFormValues) => {
-    if (!wpConfig?.wp_url || !wpConfig?.wp_username || !wpConfig?.wp_token) {
-      throw new Error('WordPress configuration is missing');
-    }
-
-    try {
-      console.log('Creando usuario en WordPress...');
-      
-      // Primero obtenemos un token nonce para la creación de usuarios
-      const nonceResponse = await fetch(`${wpConfig.wp_url}/wp-json/wp/v2/users/me`, {
-        headers: {
-          'Authorization': `Basic ${btoa(`${wpConfig.wp_username}:${wpConfig.wp_token}`)}`,
-        }
-      });
-
-      if (!nonceResponse.ok) {
-        const nonceError = await nonceResponse.text();
-        console.error('Error al obtener nonce:', nonceError);
-        throw new Error('No se pudo autenticar con WordPress');
-      }
-
-      // Ahora creamos el usuario con el token de autenticación
-      const response = await fetch(`${wpConfig.wp_url}/wp-json/wp/v2/users`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Basic ${btoa(`${wpConfig.wp_username}:${wpConfig.wp_token}`)}`,
-          'Content-Type': 'application/json',
-          'X-WP-Nonce': nonceResponse.headers.get('X-WP-Nonce') || '',
-        },
-        body: JSON.stringify({
-          username: values.username,
-          email: values.email,
-          password: values.password,
-          roles: ['subscriber'],
-        }),
-      });
-
-      const responseText = await response.text();
-      console.log('Respuesta de WordPress:', responseText);
-
-      if (!response.ok) {
-        try {
-          const errorData = JSON.parse(responseText);
-          throw new Error(errorData.message || 'Error creating WordPress user');
-        } catch (e) {
-          throw new Error(`Error creating WordPress user: ${responseText}`);
-        }
-      }
-
-      const userData = JSON.parse(responseText);
-      console.log('Usuario creado en WordPress:', userData);
-      return userData;
-    } catch (error) {
-      console.error('Error detallado:', error);
-      throw error;
-    }
-  };
-
-  const createLocalUser = async (values: TestUserFormValues, wpUserId: number) => {
-    console.log('Creando usuario local...');
-    const { error } = await supabase
-      .from('users')
-      .insert({
-        wordpress_user_id: wpUserId,
-        username: values.username,
-        email: values.email,
-        account_status: 'active',
-        email_verified: false,
-      });
-
-    if (error) {
-      console.error('Error Supabase:', error);
-      throw error;
-    }
-  };
 
   const onSubmit = async (values: TestUserFormValues) => {
     try {
