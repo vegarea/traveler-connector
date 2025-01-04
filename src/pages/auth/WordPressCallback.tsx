@@ -14,8 +14,10 @@ const WordPressCallback = () => {
     const processToken = async () => {
       try {
         const token = searchParams.get('token');
+        console.log('Token recibido:', token);
         
         if (!token) {
+          console.error('No se recibió token');
           toast({
             title: "Error de autenticación",
             description: "No se recibió el token de WordPress",
@@ -26,8 +28,12 @@ const WordPressCallback = () => {
         }
 
         // Validar el token
+        console.log('Intentando validar token...');
         const payload = await validateWordPressToken(token);
+        console.log('Resultado de validación:', payload);
+        
         if (!payload) {
+          console.error('Token inválido');
           toast({
             title: "Error de autenticación",
             description: "Token de WordPress inválido",
@@ -38,8 +44,12 @@ const WordPressCallback = () => {
         }
 
         // Sincronizar usuario
+        console.log('Intentando sincronizar usuario:', payload);
         const user = await syncWordPressUser(payload);
+        console.log('Resultado de sincronización:', user);
+        
         if (!user) {
+          console.error('Error en sincronización de usuario');
           toast({
             title: "Error",
             description: "No se pudo sincronizar el usuario",
@@ -59,9 +69,10 @@ const WordPressCallback = () => {
         });
 
         // Redirigir al perfil del usuario
+        console.log('Redirigiendo a perfil:', `/u/${user.username}`);
         navigate(`/u/${user.username}`);
       } catch (error) {
-        console.error('Error processing WordPress token:', error);
+        console.error('Error procesando token de WordPress:', error);
         toast({
           title: "Error",
           description: "Ocurrió un error al procesar la autenticación",

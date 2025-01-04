@@ -8,7 +8,7 @@ interface WordPressTokenPayload {
 
 export const validateWordPressToken = async (token: string): Promise<WordPressTokenPayload | null> => {
   try {
-    console.log('Validando token de WordPress...');
+    console.log('Iniciando validación de token de WordPress...');
     
     // Obtener la configuración de WordPress
     const { data: wpConfig, error: configError } = await supabase
@@ -21,6 +21,8 @@ export const validateWordPressToken = async (token: string): Promise<WordPressTo
       return null;
     }
 
+    console.log('URL de WordPress obtenida:', wpConfig.wp_url);
+
     // Validar el token contra el endpoint de WordPress
     const response = await fetch(`${wpConfig.wp_url}/wp-json/jwt-auth/v1/token/validate`, {
       method: 'POST',
@@ -30,8 +32,11 @@ export const validateWordPressToken = async (token: string): Promise<WordPressTo
       }
     });
 
+    console.log('Respuesta de validación:', response.status);
+
     if (!response.ok) {
-      console.error('Token inválido:', await response.text());
+      const errorText = await response.text();
+      console.error('Token inválido:', errorText);
       return null;
     }
 
@@ -48,7 +53,7 @@ export const validateWordPressToken = async (token: string): Promise<WordPressTo
 
 export const syncWordPressUser = async (payload: WordPressTokenPayload) => {
   try {
-    console.log('Sincronizando usuario de WordPress:', payload);
+    console.log('Iniciando sincronización de usuario de WordPress:', payload);
     
     const { data: existingUser, error: userError } = await supabase
       .from('users')
@@ -62,6 +67,7 @@ export const syncWordPressUser = async (payload: WordPressTokenPayload) => {
     }
 
     if (existingUser) {
+      console.log('Usuario existente encontrado:', existingUser);
       // Actualizar usuario existente
       const { data: updatedUser, error: updateError } = await supabase
         .from('users')
@@ -79,8 +85,10 @@ export const syncWordPressUser = async (payload: WordPressTokenPayload) => {
         return null;
       }
 
+      console.log('Usuario actualizado:', updatedUser);
       return updatedUser;
     } else {
+      console.log('Creando nuevo usuario...');
       // Crear nuevo usuario
       const { data: newUser, error: createError } = await supabase
         .from('users')
@@ -100,6 +108,7 @@ export const syncWordPressUser = async (payload: WordPressTokenPayload) => {
         return null;
       }
 
+      console.log('Nuevo usuario creado:', newUser);
       return newUser;
     }
   } catch (error) {
