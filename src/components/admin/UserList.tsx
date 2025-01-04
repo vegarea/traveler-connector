@@ -30,7 +30,7 @@ interface User {
   last_login_date: string | null;
   account_status: string;
   email_verified: boolean;
-  user_roles?: UserRole[];
+  user_roles: UserRole[];
 }
 
 export const UserList = () => {
@@ -44,11 +44,10 @@ export const UserList = () => {
           user_roles (
             role
           )
-        `)
-        .order('created_at', { ascending: false });
+        `);
 
       if (error) throw error;
-      return data;
+      return data as User[];
     }
   });
 
