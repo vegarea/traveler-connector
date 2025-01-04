@@ -13,13 +13,11 @@ const WordPressCallback = () => {
   useEffect(() => {
     const processToken = async () => {
       try {
-        console.log('🔄 Iniciando proceso de callback de WordPress...');
-        
         const token = searchParams.get('token');
-        console.log('📦 Token recibido en callback:', token ? 'Token presente' : 'Token ausente');
+        console.log('Token recibido:', token);
         
         if (!token) {
-          console.error('❌ Error: No se recibió token en la URL');
+          console.error('No se recibió token');
           toast({
             title: "Error de autenticación",
             description: "No se recibió el token de WordPress",
@@ -30,12 +28,12 @@ const WordPressCallback = () => {
         }
 
         // Validar el token
-        console.log('🔑 Intentando validar token JWT...');
+        console.log('Intentando validar token...');
         const payload = await validateWordPressToken(token);
-        console.log('✅ Resultado de validación JWT:', payload);
+        console.log('Resultado de validación:', payload);
         
         if (!payload) {
-          console.error('❌ Error: Token JWT inválido o expirado');
+          console.error('Token inválido');
           toast({
             title: "Error de autenticación",
             description: "Token de WordPress inválido",
@@ -46,17 +44,12 @@ const WordPressCallback = () => {
         }
 
         // Sincronizar usuario
-        console.log('👤 Iniciando sincronización de usuario:', {
-          email: payload.user_email,
-          username: payload.user_nicename,
-          userId: payload.user_id
-        });
-        
+        console.log('Intentando sincronizar usuario:', payload);
         const user = await syncWordPressUser(payload);
-        console.log('✅ Resultado de sincronización:', user);
+        console.log('Resultado de sincronización:', user);
         
         if (!user) {
-          console.error('❌ Error: Fallo en sincronización de usuario');
+          console.error('Error en sincronización de usuario');
           toast({
             title: "Error",
             description: "No se pudo sincronizar el usuario",
@@ -67,27 +60,19 @@ const WordPressCallback = () => {
         }
 
         // Guardar token y datos de usuario
-        console.log('💾 Guardando token y datos en localStorage');
         localStorage.setItem('wp_token', token);
         localStorage.setItem('user', JSON.stringify(user));
 
-        console.log('🎉 Proceso de autenticación completado exitosamente');
         toast({
           title: "¡Bienvenido!",
           description: "Has iniciado sesión correctamente",
         });
 
         // Redirigir al perfil del usuario
-        console.log('🔄 Redirigiendo a perfil:', `/u/${user.username}`);
+        console.log('Redirigiendo a perfil:', `/u/${user.username}`);
         navigate(`/u/${user.username}`);
       } catch (error) {
-        console.error('❌ Error crítico en proceso de autenticación:', error);
-        if (error instanceof Error) {
-          console.error('Detalles del error:', {
-            message: error.message,
-            stack: error.stack
-          });
-        }
+        console.error('Error procesando token de WordPress:', error);
         toast({
           title: "Error",
           description: "Ocurrió un error al procesar la autenticación",
