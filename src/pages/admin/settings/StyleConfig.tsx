@@ -1,9 +1,85 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import LogoUploader from '@/components/admin/settings/LogoUploader';
+import { supabase } from "@/integrations/supabase/client";
+
+interface LogoConfig {
+  id: string;
+  type: string;
+  url: string;
+  alt_text?: string;
+  width?: number;
+  height?: number;
+}
 
 const StyleConfig = () => {
+  const [logos, setLogos] = useState<Record<string, LogoConfig>>({});
+
+  useEffect(() => {
+    fetchLogos();
+  }, []);
+
+  const fetchLogos = async () => {
+    const { data, error } = await supabase
+      .from('logo_config')
+      .select('*');
+
+    if (error) {
+      console.error('Error fetching logos:', error);
+      return;
+    }
+
+    const logosMap = data.reduce((acc, logo) => {
+      acc[logo.type] = logo;
+      return acc;
+    }, {} as Record<string, LogoConfig>);
+
+    setLogos(logosMap);
+  };
+
+  const handleLogoUpdate = async (type: string, logoData: Omit<LogoConfig, 'id' | 'type'>) => {
+    const existingLogo = logos[type];
+    
+    if (existingLogo) {
+      // Update existing logo
+      const { error } = await supabase
+        .from('logo_config')
+        .update({
+          url: logoData.url,
+          alt_text: logoData.alt_text,
+          width: logoData.width,
+          height: logoData.height,
+        })
+        .eq('id', existingLogo.id);
+
+      if (error) {
+        console.error('Error updating logo:', error);
+        return;
+      }
+    } else {
+      // Insert new logo
+      const { error } = await supabase
+        .from('logo_config')
+        .insert({
+          type,
+          url: logoData.url,
+          alt_text: logoData.alt_text,
+          width: logoData.width,
+          height: logoData.height,
+        });
+
+      if (error) {
+        console.error('Error inserting logo:', error);
+        return;
+      }
+    }
+
+    // Refresh logos after update
+    fetchLogos();
+  };
+
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-bold mb-6">Estilo y Marca</h1>
@@ -65,25 +141,6 @@ const StyleConfig = () => {
                   </div>
                 </div>
               </div>
-
-              {/* Usage Examples */}
-              <div className="space-y-4">
-                <Label className="text-lg font-semibold">Ejemplos de Uso</Label>
-                <div className="space-y-4">
-                  <button className="px-4 py-2 bg-[#F4007A] text-white rounded-md hover:bg-[#d1006a] transition-colors">
-                    Botón de Ejemplo
-                  </button>
-                  <div className="p-4 bg-[#E2F3FD] rounded-md">
-                    Notificación de Información
-                  </div>
-                  <div className="p-4 bg-[#E1F6EB] rounded-md">
-                    Notificación de Éxito
-                  </div>
-                  <div className="p-4 bg-[#FEEAF1] rounded-md">
-                    Notificación de Error
-                  </div>
-                </div>
-              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -91,17 +148,24 @@ const StyleConfig = () => {
         <TabsContent value="logo">
           <Card>
             <CardHeader>
-              <CardTitle>Logo</CardTitle>
+              <CardTitle>Gestión de Logos</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <p className="text-muted-foreground">
-                  El logo principal está diseñado en blanco y negro para mantener la consistencia con la paleta principal del sitio.
-                </p>
-                <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center">
-                  <p className="text-muted-foreground">Área para previsualización del logo</p>
-                </div>
-              </div>
+            <CardContent className="space-y-8">
+              <LogoUploader
+                type="header_desktop"
+                title="Logo Header (Escritorio)"
+                description="Logo principal para la cabecera en versión escritorio"
+                currentLogo={logos['header_desktop']}
+                onUploadSuccess={(logoData) => handleLogoUpdate('header_desktop', logoData)}
+              />
+
+              <LogoUploader
+                type="header_mobile"
+                title="Logo Header (Móvil)"
+                description="Versión del logo optimizada para dispositivos móviles"
+                currentLogo={logos['header_mobile']}
+                onUploadSuccess={(logoData) => handleLogoUpdate('header_mobile', logoData)}
+              />
             </CardContent>
           </Card>
         </TabsContent>
