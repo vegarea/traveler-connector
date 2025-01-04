@@ -80,11 +80,6 @@ const AdminLayout = () => {
           icon: Settings,
         },
         {
-          title: "Permisos",
-          path: "/admin/settings/permissions",
-          icon: Users,
-        },
-        {
           title: "Estilo y Marca",
           path: "/admin/settings/style",
           icon: Palette,

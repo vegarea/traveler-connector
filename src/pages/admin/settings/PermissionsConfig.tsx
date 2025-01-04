@@ -1,8 +1,14 @@
-import React from 'react';
-import { PermissionsCheck } from '@/components/admin/permissions/PermissionsCheck';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const PermissionsConfig = () => {
-  return <PermissionsCheck />;
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    navigate('/admin/settings/wordpress');
+  }, [navigate]);
+
+  return null;
 };
 
 export default PermissionsConfig;
