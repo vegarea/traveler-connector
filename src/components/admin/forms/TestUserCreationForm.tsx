@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { getJWTToken } from "../permissions/utils/wordpressApi";
 
 const testUserSchema = z.object({
   username: z.string().min(3, "El nombre de usuario debe tener al menos 3 caracteres"),
@@ -52,19 +51,11 @@ export const TestUserCreationForm = () => {
     }
 
     try {
-      console.log('Obteniendo token JWT para crear usuario...');
-      const jwtResponse = await getJWTToken(
-        wpConfig.wp_url,
-        wpConfig.wp_username,
-        wpConfig.wp_token
-      );
-      console.log('Token JWT obtenido:', jwtResponse);
-
       console.log('Creando usuario en WordPress...');
       const response = await fetch(`${wpConfig.wp_url}/wp-json/wp/v2/users`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${jwtResponse.token}`,
+          'Authorization': `Basic ${btoa(`${wpConfig.wp_username}:${wpConfig.wp_token}`)}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -75,18 +66,19 @@ export const TestUserCreationForm = () => {
         }),
       });
 
+      const responseText = await response.text();
+      console.log('Respuesta de WordPress:', responseText);
+
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error response from WordPress:', errorText);
         try {
-          const errorData = JSON.parse(errorText);
+          const errorData = JSON.parse(responseText);
           throw new Error(errorData.message || 'Error creating WordPress user');
         } catch (e) {
-          throw new Error(`Error creating WordPress user: ${errorText}`);
+          throw new Error(`Error creating WordPress user: ${responseText}`);
         }
       }
 
-      const userData = await response.json();
+      const userData = JSON.parse(responseText);
       console.log('Usuario creado en WordPress:', userData);
       return userData;
     } catch (error) {
