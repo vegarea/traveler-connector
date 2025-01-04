@@ -9,6 +9,8 @@ export const CORPORATE_COLORS = {
   PASTEL_BLUE: '#E2F3FD',
   PASTEL_GREEN: '#E1F6EB',
   PASTEL_PINK: '#FEEAF1',
+  PASTEL_ORANGE: '#FEC6A1',  // New color for warnings
+  PASTEL_LIGHT_BLUE: '#D3E4FD',  // New color for inactive states
 } as const;
 
 /**
@@ -23,6 +25,8 @@ export const TAILWIND_COLORS = {
     blue: '201 89% 94%',   // #E2F3FD
     green: '152 50% 92%',  // #E1F6EB
     pink: '341 95% 95%',   // #FEEAF1
+    orange: '24 96% 81%',  // #FEC6A1
+    lightBlue: '217 89% 91%', // #D3E4FD
   },
 } as const;
 

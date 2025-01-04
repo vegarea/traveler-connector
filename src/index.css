@@ -29,8 +29,12 @@
     /* Colores de notificaciones */
     --info: 201 89% 94%;        /* Azul Pastel #E2F3FD */
     --success: 152 50% 92%;     /* Verde Pastel #E1F6EB */
+    --warning: 24 96% 81%;      /* Naranja Pastel #FEC6A1 */
     --destructive: 341 95% 95%; /* Rosa Pastel #FEEAF1 */
     --destructive-foreground: 0 0% 0%;
+    
+    /* Estados adicionales */
+    --inactive: 217 89% 91%;    /* Azul Claro Pastel #D3E4FD */
 
     --border: 0 0% 90%;
     --input: 0 0% 90%;
@@ -74,8 +78,12 @@
     /* Colores de notificaciones */
     --info: 201 89% 94%;        /* Azul Pastel #E2F3FD */
     --success: 152 50% 92%;     /* Verde Pastel #E1F6EB */
+    --warning: 24 96% 81%;      /* Naranja Pastel #FEC6A1 */
     --destructive: 341 95% 95%; /* Rosa Pastel #FEEAF1 */
     --destructive-foreground: 0 0% 100%;
+    
+    /* Estados adicionales */
+    --inactive: 217 89% 91%;    /* Azul Claro Pastel #D3E4FD */
 
     --border: 0 0% 14%;
     --input: 0 0% 14%;
