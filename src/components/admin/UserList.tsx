@@ -82,72 +82,74 @@ export const UserList = () => {
   }
 
   return (
-    <Card>
+    <Card className="w-full shadow-sm">
       <CardHeader>
         <CardTitle>Lista de Usuarios</CardTitle>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Usuario</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead>Email Verificado</TableHead>
-              <TableHead>Rol</TableHead>
-              <TableHead>Registro</TableHead>
-              <TableHead>Último acceso</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users?.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <Avatar>
-                      <AvatarImage src={user.avatar_url || ''} />
-                      <AvatarFallback>
-                        {user.username.substring(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span>{user.username}</span>
-                  </div>
-                </TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>
-                  <Badge variant={getStatusColor(user.account_status)}>
-                    <span className="flex items-center gap-1">
-                      {user.account_status === 'active' ? (
-                        <Check className="h-3 w-3" />
-                      ) : (
-                        <X className="h-3 w-3" />
-                      )}
-                      {user.account_status === 'active' ? 'Activo' : 'Inactivo'}
-                    </span>
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  {user.email_verified ? (
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <Mail className="h-4 w-4 text-yellow-500" />
-                  )}
-                </TableCell>
-                <TableCell>
-                  {getRoleBadge(user.user_roles?.[0]?.role || 'user')}
-                </TableCell>
-                <TableCell>
-                  {format(new Date(user.created_at), 'dd/MM/yyyy')}
-                </TableCell>
-                <TableCell>
-                  {user.last_login_date
-                    ? format(new Date(user.last_login_date), 'dd/MM/yyyy HH:mm')
-                    : 'Nunca'}
-                </TableCell>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[250px]">Usuario</TableHead>
+                <TableHead className="w-[250px]">Email</TableHead>
+                <TableHead className="w-[150px]">Estado</TableHead>
+                <TableHead className="w-[150px]">Email Verificado</TableHead>
+                <TableHead className="w-[150px]">Rol</TableHead>
+                <TableHead className="w-[150px]">Registro</TableHead>
+                <TableHead className="w-[200px]">Último acceso</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {users?.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <Avatar>
+                        <AvatarImage src={user.avatar_url || ''} />
+                        <AvatarFallback>
+                          {user.username.substring(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="font-medium">{user.username}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="font-medium">{user.email}</TableCell>
+                  <TableCell>
+                    <Badge variant={getStatusColor(user.account_status)}>
+                      <span className="flex items-center gap-1">
+                        {user.account_status === 'active' ? (
+                          <Check className="h-3 w-3" />
+                        ) : (
+                          <X className="h-3 w-3" />
+                        )}
+                        {user.account_status === 'active' ? 'Activo' : 'Inactivo'}
+                      </span>
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {user.email_verified ? (
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <Mail className="h-4 w-4 text-yellow-500" />
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {getRoleBadge(user.user_roles?.[0]?.role || 'user')}
+                  </TableCell>
+                  <TableCell>
+                    {format(new Date(user.created_at), 'dd/MM/yyyy')}
+                  </TableCell>
+                  <TableCell>
+                    {user.last_login_date
+                      ? format(new Date(user.last_login_date), 'dd/MM/yyyy HH:mm')
+                      : 'Nunca'}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );

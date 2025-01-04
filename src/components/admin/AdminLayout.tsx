@@ -111,7 +111,7 @@ const AdminLayout = () => {
   };
 
   return (
-    <div className="flex h-screen w-full">
+    <div className="flex min-h-screen w-full">
       {/* Sidebar */}
       <aside className="w-72 flex-shrink-0 flex flex-col bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-purple-100 dark:border-gray-800">
         <nav className="h-full flex flex-col">
@@ -134,9 +134,9 @@ const AdminLayout = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-hidden bg-gradient-to-br from-white to-purple-50 dark:from-gray-900 dark:to-gray-800">
-        <div className="h-full overflow-y-auto p-8">
-          <div className="w-full">
+      <main className="flex-1 flex flex-col bg-gradient-to-br from-white to-purple-50 dark:from-gray-900 dark:to-gray-800">
+        <div className="flex-1 overflow-y-auto">
+          <div className="p-8 w-full">
             <Outlet />
           </div>
         </div>
