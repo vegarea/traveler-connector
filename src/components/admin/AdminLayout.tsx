@@ -111,13 +111,11 @@ const AdminLayout = () => {
   };
 
   return (
-    <div className="flex min-h-screen w-full">
-      {/* Sidebar sin márgenes externos */}
-      <aside className="w-72 flex flex-col bg-gradient-to-b from-white via-slate-100 to-slate-200 border-r border-slate-200 shadow-lg">
+    <div className="flex h-screen w-screen overflow-hidden">
+      <aside className="w-72 flex-shrink-0 flex flex-col bg-gradient-to-b from-white via-slate-100 to-slate-200 border-r border-slate-200 shadow-lg">
         <nav className="h-full flex flex-col">
           <SidebarHeader headerLogo={headerLogo} isCollapsed={false} />
           
-          {/* Menu Items */}
           <div className="flex-1 overflow-y-auto py-6 space-y-1">
             {menuItems.map((item) => (
               <SidebarMenuItem
@@ -134,10 +132,9 @@ const AdminLayout = () => {
         </nav>
       </aside>
 
-      {/* Main Content sin márgenes externos */}
       <main className="flex-1 flex flex-col overflow-hidden bg-gradient-to-br from-slate-200 to-slate-100">
         <div className="flex-1 overflow-y-auto">
-          <div className="p-8 max-w-7xl mx-auto w-full">
+          <div className="p-8">
             <Outlet />
           </div>
         </div>
