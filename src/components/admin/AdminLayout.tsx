@@ -1,6 +1,14 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Settings, Users, Activity, LogOut } from 'lucide-react';
+import { 
+  LayoutDashboard, 
+  Users, 
+  Settings, 
+  UserCircle, 
+  Users2, 
+  Activity,
+  LogOut 
+} from 'lucide-react';
 import { cn } from "@/lib/utils";
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
@@ -9,20 +17,54 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   
   const menuItems = [
     {
-      title: "Configuración",
+      title: "Dashboard",
       path: "/admin",
-      icon: Settings,
+      icon: LayoutDashboard,
     },
     {
-      title: "Perfiles",
-      path: "/admin/travelbuddys/profiles",
+      title: "Usuarios",
+      path: "/admin/users",
       icon: Users,
     },
     {
-      title: "Actividad",
-      path: "/admin/travelbuddys/activity",
-      icon: Activity,
-    }
+      title: "TravelBuddies",
+      path: "/admin/travelbuddies",
+      icon: Users2,
+      submenu: [
+        {
+          title: "Perfiles",
+          path: "/admin/travelbuddies/profiles",
+          icon: UserCircle,
+        },
+        {
+          title: "Grupos",
+          path: "/admin/travelbuddies/groups",
+          icon: Users2,
+        },
+        {
+          title: "Actividad",
+          path: "/admin/travelbuddies/activity",
+          icon: Activity,
+        },
+      ],
+    },
+    {
+      title: "Configuración",
+      path: "/admin/settings",
+      icon: Settings,
+      submenu: [
+        {
+          title: "WordPress",
+          path: "/admin/settings/wordpress",
+          icon: Settings,
+        },
+        {
+          title: "Permisos",
+          path: "/admin/settings/permissions",
+          icon: Users,
+        },
+      ],
+    },
   ];
 
   const handleLogout = () => {
@@ -31,10 +73,21 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     navigate('/login');
   };
 
+  const isActiveRoute = (path: string) => {
+    if (path === '/admin' && location.pathname === '/admin') {
+      return true;
+    }
+    return location.pathname.startsWith(path) && path !== '/admin';
+  };
+
+  const isActiveSubmenuItem = (path: string) => {
+    return location.pathname === path;
+  };
+
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}
-      <aside className="w-64 border-r bg-sidebar">
+      <aside className="w-64 border-r bg-card">
         <nav className="h-full flex flex-col">
           <div className="p-4 border-b">
             <h2 className="text-lg font-semibold">Panel Admin</h2>
@@ -43,21 +96,49 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           {/* Menu Items */}
           <div className="flex-1 overflow-y-auto p-4 space-y-2">
             {menuItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={cn(
-                  "flex items-center gap-3 px-4 py-2.5 rounded-md transition-colors",
-                  "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                  "active:bg-sidebar-accent/80",
-                  location.pathname === item.path 
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground" 
-                    : "text-sidebar-foreground"
+              <div key={item.path} className="space-y-1">
+                <Link
+                  to={item.submenu ? '#' : item.path}
+                  className={cn(
+                    "flex items-center gap-3 px-4 py-2.5 rounded-md transition-colors w-full",
+                    "hover:bg-accent hover:text-accent-foreground",
+                    "active:bg-accent/80",
+                    isActiveRoute(item.path) 
+                      ? "bg-accent text-accent-foreground" 
+                      : "text-foreground"
+                  )}
+                  onClick={(e) => {
+                    if (item.submenu) {
+                      e.preventDefault();
+                    }
+                  }}
+                >
+                  <item.icon className="w-5 h-5" />
+                  <span>{item.title}</span>
+                </Link>
+
+                {item.submenu && (
+                  <div className="ml-4 pl-4 border-l space-y-1">
+                    {item.submenu.map((subItem) => (
+                      <Link
+                        key={subItem.path}
+                        to={subItem.path}
+                        className={cn(
+                          "flex items-center gap-3 px-4 py-2 rounded-md transition-colors w-full text-sm",
+                          "hover:bg-accent hover:text-accent-foreground",
+                          "active:bg-accent/80",
+                          isActiveSubmenuItem(subItem.path)
+                            ? "bg-accent text-accent-foreground"
+                            : "text-muted-foreground"
+                        )}
+                      >
+                        <subItem.icon className="w-4 h-4" />
+                        <span>{subItem.title}</span>
+                      </Link>
+                    ))}
+                  </div>
                 )}
-              >
-                <item.icon className="w-5 h-5" />
-                <span>{item.title}</span>
-              </Link>
+              </div>
             ))}
           </div>
           
@@ -67,9 +148,9 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
               onClick={handleLogout}
               className={cn(
                 "flex w-full items-center gap-3 px-4 py-2.5 rounded-md transition-colors",
-                "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                "active:bg-sidebar-accent/80",
-                "text-sidebar-foreground"
+                "hover:bg-accent hover:text-accent-foreground",
+                "active:bg-accent/80",
+                "text-foreground"
               )}
             >
               <LogOut className="w-5 h-5" />
