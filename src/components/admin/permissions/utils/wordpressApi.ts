@@ -2,12 +2,56 @@ export const createAuthHeader = (username: string, token: string) => {
   return `Basic ${btoa(`${username}:${token}`)}`;
 };
 
+export const getJWTToken = async (wpUrl: string, username: string, password: string) => {
+  console.log('Obteniendo token JWT...');
+  const response = await fetch(`${wpUrl}/wp-json/jwt-auth/v1/token`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      username,
+      password
+    })
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    console.error('Error al obtener token JWT:', errorData);
+    throw new Error(errorData.message || 'Error al obtener token JWT');
+  }
+
+  const data = await response.json();
+  console.log('Token JWT obtenido exitosamente');
+  return data;
+};
+
+export const validateJWTToken = async (wpUrl: string, token: string) => {
+  console.log('Validando token JWT...');
+  const response = await fetch(`${wpUrl}/wp-json/jwt-auth/v1/token/validate`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    console.error('Error al validar token JWT:', errorData);
+    throw new Error(errorData.message || 'Token JWT inválido');
+  }
+
+  const data = await response.json();
+  console.log('Token JWT validado exitosamente:', data);
+  return data;
+};
+
 export const checkEndpoint = async (endpoint: string, wpUrl: string, wpUsername: string, wpToken: string) => {
   console.log(`Verificando endpoint: ${endpoint}`);
   try {
     const response = await fetch(`${wpUrl}/wp-json${endpoint}`, {
       headers: {
-        'Authorization': createAuthHeader(wpUsername, wpToken)
+        'Authorization': `Bearer ${wpToken}`
       }
     });
     
@@ -36,7 +80,7 @@ export const fetchUserStructure = async (wpUrl: string, wpUsername: string, wpTo
   try {
     const response = await fetch(`${wpUrl}/wp-json/wp/v2/users/me`, {
       headers: {
-        'Authorization': createAuthHeader(wpUsername, wpToken)
+        'Authorization': `Bearer ${wpToken}`
       }
     });
 

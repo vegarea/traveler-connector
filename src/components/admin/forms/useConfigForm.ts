@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { configSchema, ConfigFormValues } from './types';
 import { useEffect, useState } from "react";
+import { getJWTToken, validateJWTToken } from "../permissions/utils/wordpressApi";
 
 export const useConfigForm = () => {
   const { toast } = useToast();
@@ -62,31 +63,23 @@ export const useConfigForm = () => {
       // Eliminar espacios en blanco del token
       const cleanToken = configToTest.wp_token.replace(/\s+/g, '');
       
-      // First try to get the nonce
-      const baseResponse = await fetch(`${configToTest.wp_url}/wp-json`);
-      if (!baseResponse.ok) {
-        throw new Error('No se pudo conectar con WordPress');
-      }
+      console.log('Iniciando prueba de conexión con WordPress usando JWT...');
 
-      // Then try to authenticate with username:password
-      const response = await fetch(`${configToTest.wp_url}/wp-json/wp/v2/users/me`, {
-        headers: {
-          'Authorization': `Basic ${btoa(`${configToTest.wp_username}:${cleanToken}`)}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      // Obtener token JWT
+      const jwtResponse = await getJWTToken(
+        configToTest.wp_url,
+        configToTest.wp_username,
+        cleanToken
+      );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error de conexión con WordPress');
-      }
+      // Validar el token JWT
+      await validateJWTToken(configToTest.wp_url, jwtResponse.token);
 
-      const data = await response.json();
       setIsConnected(true);
       
       toast({
         title: "Conexión exitosa",
-        description: `Conectado como: ${data.name}`,
+        description: `Conectado como: ${jwtResponse.user_display_name}`,
       });
 
       return true;
@@ -95,7 +88,7 @@ export const useConfigForm = () => {
       setIsConnected(false);
       toast({
         title: "Error de conexión",
-        description: "No se pudo conectar con WordPress. Verifica el usuario y el token de aplicación.",
+        description: error instanceof Error ? error.message : "Error al conectar con WordPress. Verifica las credenciales y que el plugin JWT Auth esté activo.",
         variant: "destructive",
       });
       return false;
