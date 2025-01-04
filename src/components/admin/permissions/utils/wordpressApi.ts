@@ -23,7 +23,7 @@ export const getJWTToken = async (wpUrl: string, username: string, password: str
     }
 
     const data = await response.json();
-    console.log('Token JWT obtenido exitosamente');
+    console.log('Token JWT obtenido exitosamente:', data);
     return data;
   } catch (error) {
     console.error('Error en la solicitud JWT:', error);
@@ -61,11 +61,13 @@ export const checkEndpoint = async (endpoint: string, wpUrl: string, wpUsername:
   try {
     // Primero obtenemos un token JWT usando las credenciales
     const jwtResponse = await getJWTToken(wpUrl, wpUsername, wpToken);
+    console.log('Token JWT obtenido para endpoint:', endpoint);
     
     // Usamos el token JWT para la verificación del endpoint
     const response = await fetch(`${wpUrl}/wp-json${endpoint}`, {
       headers: {
-        'Authorization': `Bearer ${jwtResponse.token}`
+        'Authorization': `Bearer ${jwtResponse.token}`,
+        'Content-Type': 'application/json'
       }
     });
     
@@ -94,10 +96,12 @@ export const fetchUserStructure = async (wpUrl: string, wpUsername: string, wpTo
   try {
     // Primero obtenemos un token JWT usando las credenciales
     const jwtResponse = await getJWTToken(wpUrl, wpUsername, wpToken);
+    console.log('Token JWT obtenido para estructura de usuario');
     
     const response = await fetch(`${wpUrl}/wp-json/wp/v2/users/me`, {
       headers: {
-        'Authorization': `Bearer ${jwtResponse.token}`
+        'Authorization': `Bearer ${jwtResponse.token}`,
+        'Content-Type': 'application/json'
       }
     });
 
