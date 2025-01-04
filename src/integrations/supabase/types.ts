@@ -42,6 +42,71 @@ export type Database = {
         }
         Relationships: []
       }
+      profile_components: {
+        Row: {
+          component_key: string
+          component_name: string
+          created_at: string
+          description: string | null
+          enabled: boolean | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          component_key: string
+          component_name: string
+          created_at?: string
+          description?: string | null
+          enabled?: boolean | null
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          component_key?: string
+          component_name?: string
+          created_at?: string
+          description?: string | null
+          enabled?: boolean | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profile_type_components: {
+        Row: {
+          component_id: string | null
+          created_at: string
+          enabled: boolean | null
+          id: string
+          profile_type: Database["public"]["Enums"]["profile_type"]
+          updated_at: string
+        }
+        Insert: {
+          component_id?: string | null
+          created_at?: string
+          enabled?: boolean | null
+          id?: string
+          profile_type: Database["public"]["Enums"]["profile_type"]
+          updated_at?: string
+        }
+        Update: {
+          component_id?: string | null
+          created_at?: string
+          enabled?: boolean | null
+          id?: string
+          profile_type?: Database["public"]["Enums"]["profile_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_type_components_component_id_fkey"
+            columns: ["component_id"]
+            isOneToOne: false
+            referencedRelation: "profile_components"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sync_logs: {
         Row: {
           created_at: string
@@ -197,6 +262,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      profile_type: "traveler" | "premium" | "agency" | "expert"
     }
     CompositeTypes: {
       [_ in never]: never
