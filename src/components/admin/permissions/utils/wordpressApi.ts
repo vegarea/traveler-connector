@@ -78,3 +78,29 @@ export const getCurrentUser = async (wpUrl: string, token: string) => {
     throw error;
   }
 };
+
+export const loginToWordPress = async (wpUrl: string, token: string) => {
+  console.log('Iniciando sesión en WordPress...');
+  try {
+    const response = await fetch(`${wpUrl}/wp-json/jwt-auth/v1/token/validate`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json',
+      }
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      console.error('Error al iniciar sesión:', data);
+      throw new Error(data.message || 'Error al iniciar sesión en WordPress');
+    }
+
+    console.log('Sesión iniciada exitosamente');
+    return { success: true, ...data };
+  } catch (error) {
+    console.error('Error al iniciar sesión:', error);
+    throw error;
+  }
+};
