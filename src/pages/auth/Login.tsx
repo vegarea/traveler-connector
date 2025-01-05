@@ -32,7 +32,7 @@ const Login = () => {
   });
 
   const onSubmit = async (values: LoginFormValues) => {
-    if (!wpConfig?.wp_url || !wpConfig?.wp_username || !wpConfig?.wp_token) {
+    if (!wpConfig?.wp_url) {
       toast({
         title: "Error de configuración",
         description: "No se encontró la configuración de WordPress",
@@ -43,21 +43,17 @@ const Login = () => {
 
     try {
       setIsLoggingIn(true);
-      console.log('Iniciando proceso de login con JWT usando credenciales de admin...');
+      console.log('Iniciando proceso de login con JWT...');
       
-      // Obtener token JWT para el USUARIO usando las credenciales del ADMIN
-      // Importante: Usamos wp_token (contraseña normal) para la autenticación JWT
+      // Obtener token JWT para el usuario
       const response = await getJWTToken(
         wpConfig.wp_url,
-        values.username,    // Username del USUARIO que intenta login
-        values.password,    // Password del USUARIO que intenta login
-        wpConfig.wp_username, // Username del ADMIN para autenticación
-        wpConfig.wp_token    // Contraseña normal del ADMIN para autenticación JWT
+        values.username,    // Username del usuario que intenta login
+        values.password     // Password del usuario que intenta login
       );
 
       if (response.token) {
         console.log('Token JWT obtenido para el usuario, guardando en localStorage...');
-        // El token JWT del USUARIO ya se guarda dentro de getJWTToken
 
         // Validar el token antes de redirigir
         console.log('Validando token JWT del usuario...');

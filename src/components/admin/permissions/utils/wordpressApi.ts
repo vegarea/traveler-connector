@@ -2,30 +2,20 @@ export const createAuthHeader = (username: string, token: string) => {
   return `Basic ${btoa(`${username}:${token}`)}`;
 };
 
-export const getJWTToken = async (wpUrl: string, username: string, password: string, adminUsername?: string, adminToken?: string) => {
+export const getJWTToken = async (wpUrl: string, username: string, password: string) => {
   console.log('Obteniendo token JWT...');
   try {
     console.log('Haciendo solicitud a:', `${wpUrl}/wp-json/jwt-auth/v1/token`);
     console.log('Usuario que intenta login:', username);
-    // No mostramos las contraseñas en los logs
     
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json'
-    };
-
-    // Si se proporcionan credenciales de admin, usarlas para la autenticación básica
-    // Importante: Usamos la contraseña normal del admin, NO la contraseña de aplicación
-    if (adminUsername && adminToken) {
-      headers['Authorization'] = createAuthHeader(adminUsername, adminToken);
-      console.log('Usando autenticación de admin (contraseña normal) para la petición JWT');
-    }
-
     const response = await fetch(`${wpUrl}/wp-json/jwt-auth/v1/token`, {
       method: 'POST',
-      headers,
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
-        username,  // Credenciales del usuario que intenta login
-        password   // Contraseña del usuario que intenta login
+        username,
+        password
       })
     });
 
