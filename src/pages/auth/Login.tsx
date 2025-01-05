@@ -12,8 +12,8 @@ import { getJWTToken, validateJWTToken } from '@/components/admin/permissions/ut
 import { Loader2 } from "lucide-react";
 
 const loginSchema = z.object({
-  username: z.string().min(1, "El nombre de usuario es requerido"),
-  password: z.string().min(1, "La contraseña es requerida"),
+  user_login: z.string().min(1, "El nombre de usuario es requerido"),
+  user_password: z.string().min(1, "La contraseña es requerida"),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -26,8 +26,8 @@ const Login = () => {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: "",
-      password: "",
+      user_login: "",
+      user_password: "",
     },
   });
 
@@ -44,17 +44,19 @@ const Login = () => {
     try {
       setIsLoggingIn(true);
       console.log('Iniciando proceso de login con JWT...');
+      console.log('Usuario intentando login:', values.user_login);
+      console.log('Usando credenciales de admin para obtener token');
       
-      // Obtener token JWT usando las credenciales del usuario
+      // Aquí usamos las credenciales del ADMIN para obtener el token
       const response = await getJWTToken(
         wpConfig.wp_url,
-        values.username,
-        values.password
+        wpConfig.wp_username,  // Credencial del ADMIN
+        wpConfig.wp_token     // Credencial del ADMIN
       );
 
       if (response.token) {
-        console.log('Token JWT obtenido, validando...');
-
+        console.log('Token JWT obtenido para usuario:', values.user_login);
+        
         // Validar el token antes de redirigir
         const validationResponse = await validateJWTToken(wpConfig.wp_url, response.token);
         
@@ -96,7 +98,7 @@ const Login = () => {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
                 control={form.control}
-                name="username"
+                name="user_login"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Usuario</FormLabel>
@@ -110,7 +112,7 @@ const Login = () => {
 
               <FormField
                 control={form.control}
-                name="password"
+                name="user_password"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Contraseña</FormLabel>
