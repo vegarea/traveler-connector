@@ -7,8 +7,8 @@ export const configSchema = z.object({
   wp_api_token: z.string().optional(),
   sync_users: z.boolean().optional().default(false),
   sync_interval: z.number().optional().default(15),
-  auth_callback_url: z.string().optional(),
-  app_url: z.string().optional(),
+  auth_callback_url: z.string().url("Por favor ingresa una URL válida").optional(),
+  app_url: z.string().url("Por favor ingresa una URL válida").optional(),
 });
 
 export type ConfigFormValues = z.infer<typeof configSchema>;

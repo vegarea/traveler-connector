@@ -74,6 +74,48 @@ export const ConfigFormFields = ({ form }: ConfigFormFieldsProps) => {
           </FormItem>
         )}
       />
+
+      <FormField
+        control={form.control}
+        name="app_url"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-slate-700">URL de la Aplicación</FormLabel>
+            <FormControl>
+              <Input 
+                placeholder="https://tuapp.com" 
+                {...field} 
+                className="bg-white/70 border-slate-200 focus:border-[#F4007A]/30 focus:ring-[#F4007A]/10 transition-all duration-200"
+              />
+            </FormControl>
+            <FormDescription>
+              La URL base de tu aplicación Traveler
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="auth_callback_url"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-slate-700">URL de Callback</FormLabel>
+            <FormControl>
+              <Input 
+                placeholder="https://tuapp.com/auth/wordpress/callback" 
+                {...field} 
+                className="bg-white/70 border-slate-200 focus:border-[#F4007A]/30 focus:ring-[#F4007A]/10 transition-all duration-200"
+              />
+            </FormControl>
+            <FormDescription>
+              La URL de callback para la autenticación de WordPress
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </>
   );
 };
