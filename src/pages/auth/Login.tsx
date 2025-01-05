@@ -49,18 +49,14 @@ const Login = () => {
       const response = await getJWTToken(
         wpConfig.wp_url,
         values.username,    // Username del USUARIO que intenta login
-        values.password     // Password del USUARIO que intenta login
+        values.password,    // Password del USUARIO que intenta login
+        wpConfig.wp_username, // Username del ADMIN para autenticación
+        wpConfig.wp_token    // Token del ADMIN para autenticación
       );
 
       if (response.token) {
         console.log('Token JWT obtenido para el usuario, guardando en localStorage...');
-        // Guardar el token JWT del USUARIO en localStorage
-        localStorage.setItem('wp_token', response.token);
-        localStorage.setItem('wp_user', JSON.stringify({
-          username: response.user_nicename,
-          display_name: response.user_display_name,
-          email: response.user_email
-        }));
+        // El token JWT del USUARIO ya se guarda dentro de getJWTToken
 
         // Validar el token antes de redirigir
         console.log('Validando token JWT del usuario...');
