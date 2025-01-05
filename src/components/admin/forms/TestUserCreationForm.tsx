@@ -54,9 +54,9 @@ export const TestUserCreationForm = () => {
             description: `Usuario ${values.username} creado correctamente`,
           });
           
-          // Guardar token y redirigir
+          // Guardar token y redirigir a WordPress home
           localStorage.setItem('wp_token', jwtResponse.token);
-          window.location.href = `/u/${values.username}`;
+          window.location.href = wpConfig.wp_url;
           return;
         }
       }
