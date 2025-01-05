@@ -62,8 +62,8 @@ const Login = () => {
           email: response.user_email
         }));
         
-        // Redirigir directamente al home de WordPress
-        window.location.href = `${wpConfig.wp_url}/wp-admin`;
+        // Redirigir al home de WordPress (URL base)
+        window.location.href = wpConfig.wp_url;
       }
     } catch (error) {
       console.error('Error en login:', error);
