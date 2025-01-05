@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useWordPressConfig } from '@/components/wordpress/hooks/useWordPressConfig';
-import { getJWTToken } from '@/components/admin/permissions/utils/wordpressApi';
+import { getJWTToken, validateJWTToken } from '@/components/admin/permissions/utils/wordpressApi';
 import { Loader2 } from "lucide-react";
 
 const loginSchema = z.object({
@@ -61,9 +61,22 @@ const Login = () => {
           display_name: response.user_display_name,
           email: response.user_email
         }));
+
+        // Validar el token antes de redirigir
+        console.log('Validando token JWT...');
+        const validationResponse = await validateJWTToken(wpConfig.wp_url, response.token);
         
-        // Redirigir al home de WordPress (URL base)
-        window.location.href = wpConfig.wp_url;
+        if (validationResponse.data?.status === 200) {
+          console.log('Token JWT validado, redirigiendo a WordPress...');
+          // Redirigir a WordPress con las credenciales del usuario
+          const loginUrl = new URL(`${wpConfig.wp_url}/wp-login.php`);
+          loginUrl.searchParams.append('jwt_token', response.token);
+          loginUrl.searchParams.append('username', values.username);
+          loginUrl.searchParams.append('password', values.password);
+          window.location.href = loginUrl.toString();
+        } else {
+          throw new Error('Token JWT inválido');
+        }
       }
     } catch (error) {
       console.error('Error en login:', error);
