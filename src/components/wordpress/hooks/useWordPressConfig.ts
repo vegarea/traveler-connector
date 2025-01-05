@@ -8,7 +8,8 @@ export const useWordPressConfig = () => {
   return useQuery({
     queryKey: ['wordpress-config'],
     queryFn: async () => {
-      console.log('Fetching WordPress config...');
+      console.log('Iniciando búsqueda de configuración de WordPress...');
+      
       const { data, error } = await supabase
         .from('wordpress_config')
         .select('*')
@@ -16,23 +17,27 @@ export const useWordPressConfig = () => {
         .limit(1);
 
       if (error) {
-        console.error('Error fetching WordPress config:', error);
+        console.error('Error al obtener configuración de WordPress:', error);
         throw error;
       }
 
+      console.log('Respuesta de Supabase:', { data, error });
+
       if (!data || data.length === 0) {
-        throw new Error('No WordPress configuration found');
+        console.error('No se encontró ninguna configuración de WordPress en la base de datos');
+        throw new Error('No se encontró configuración de WordPress');
       }
 
-      console.log('WordPress config fetched:', data[0]);
+      console.log('Configuración de WordPress encontrada:', data[0]);
       return data[0];
     },
     retry: 1,
     meta: {
-      onError: () => {
+      onError: (error: Error) => {
+        console.error('Error en useWordPressConfig:', error);
         toast({
           title: "Error",
-          description: "No se pudo cargar la configuración de WordPress",
+          description: "No se pudo cargar la configuración de WordPress. ¿Has configurado WordPress en el panel de administración?",
           variant: "destructive",
         });
       }
