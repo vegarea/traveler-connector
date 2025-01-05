@@ -1,15 +1,14 @@
-import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { useWordPressConfig } from '@/components/wordpress/hooks/useWordPressConfig';
 import { getJWTToken } from '@/components/admin/permissions/utils/wordpressApi';
-import { Loader2 } from "lucide-react";
+import { useWordPressConfig } from '@/components/wordpress/hooks/useWordPressConfig';
 
 const loginSchema = z.object({
   username: z.string().min(1, "El nombre de usuario es requerido"),
@@ -20,8 +19,8 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login = () => {
   const { toast } = useToast();
-  const { data: wpConfig, isLoading: isConfigLoading } = useWordPressConfig();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const { data: wpConfig, isLoading: isLoadingConfig } = useWordPressConfig();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -45,7 +44,6 @@ const Login = () => {
       setIsLoggingIn(true);
       console.log('Iniciando proceso de login con JWT...');
       
-      // Obtener token JWT usando las credenciales del usuario que intenta loguearse
       const response = await getJWTToken(
         wpConfig.wp_url,
         values.username,
@@ -53,8 +51,6 @@ const Login = () => {
       );
 
       if (response.token) {
-        console.log('Token JWT obtenido, guardando en localStorage...');
-        // Guardar el token JWT en localStorage
         localStorage.setItem('wp_token', response.token);
         localStorage.setItem('wp_user', JSON.stringify({
           username: values.username,
@@ -62,15 +58,14 @@ const Login = () => {
           email: response.user_email
         }));
         
-        console.log('Redirigiendo al home de WordPress...');
-        // Redirigir directamente al home de WordPress
-        window.location.href = wpConfig.wp_url;
+        console.log('Login exitoso, redirigiendo...');
+        window.location.href = `${wpConfig.wp_url}/wp-admin`;
       }
     } catch (error) {
       console.error('Error en login:', error);
       toast({
         title: "Error de autenticación",
-        description: error instanceof Error ? error.message : "Error al intentar iniciar sesión",
+        description: error instanceof Error ? error.message : "Error al iniciar sesión",
         variant: "destructive",
       });
     } finally {
@@ -78,23 +73,22 @@ const Login = () => {
     }
   };
 
-  if (isConfigLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+  if (isLoadingConfig) {
+    return <div>Cargando configuración...</div>;
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Iniciar Sesión en WordPress</CardTitle>
+          <CardTitle>Iniciar sesión</CardTitle>
+          <CardDescription>
+            Ingresa con tu cuenta de WordPress
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="username"
@@ -102,13 +96,12 @@ const Login = () => {
                   <FormItem>
                     <FormLabel>Usuario</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input placeholder="usuario" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="password"
@@ -116,26 +109,18 @@ const Login = () => {
                   <FormItem>
                     <FormLabel>Contraseña</FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} />
+                      <Input type="password" placeholder="••••••••" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
               <Button 
                 type="submit" 
                 className="w-full"
                 disabled={isLoggingIn}
               >
-                {isLoggingIn ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Iniciando sesión...
-                  </>
-                ) : (
-                  'Iniciar Sesión'
-                )}
+                {isLoggingIn ? "Iniciando sesión..." : "Iniciar sesión"}
               </Button>
             </form>
           </Form>
