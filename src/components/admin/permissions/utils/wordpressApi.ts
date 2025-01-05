@@ -8,7 +8,9 @@ export const getJWTToken = async (wpUrl: string, username: string, password: str
     const response = await fetch(`${wpUrl}/wp-json/jwt-auth/v1/token`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Origin': window.location.origin
       },
       body: JSON.stringify({
         username,
@@ -37,7 +39,9 @@ export const validateJWTToken = async (wpUrl: string, token: string) => {
     const response = await fetch(`${wpUrl}/wp-json/jwt-auth/v1/token/validate`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json',
+        'Origin': window.location.origin
       }
     });
 
@@ -69,7 +73,9 @@ export const loginToWordPress = async (wpUrl: string, jwtToken: string) => {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${jwtToken}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Origin': window.location.origin
       }
     });
 
