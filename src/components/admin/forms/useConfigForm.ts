@@ -46,7 +46,6 @@ export const useConfigForm = () => {
 
       if (data && data.length > 0) {
         const config = data[0];
-        // No mostramos datos sensibles en los logs
         console.log('Configuración de WordPress cargada:', {
           ...config,
           wp_token: '[REDACTED]',
@@ -79,7 +78,6 @@ export const useConfigForm = () => {
       console.log('Iniciando prueba de conexión con WordPress usando JWT...');
       console.log('URL:', configToTest.wp_url);
       console.log('Usuario:', configToTest.wp_username);
-      // No mostramos la contraseña en los logs
       console.log('Usando contraseña normal para JWT (no contraseña de aplicación)');
 
       const jwtResponse = await getJWTTokenWithAdminCredentials(

@@ -36,10 +36,10 @@ export const getJWTTokenWithAdminCredentials = async (wpUrl: string, adminUserna
 };
 
 export const getJWTToken = async (wpUrl: string, adminUsername: string, adminToken: string, userLogin: string, userPassword: string) => {
-  console.log('Obteniendo token JWT usando credenciales de admin...');
+  console.log('Obteniendo token JWT para usuario usando credenciales de admin...');
   try {
     console.log('URL:', wpUrl);
-    console.log('Usuario admin que solicita token:', adminUsername);
+    console.log('Usuario admin que autoriza:', adminUsername);
     console.log('Usuario que intenta login:', userLogin);
     
     const response = await fetch(`${wpUrl}/wp-json/jwt-auth/v1/token`, {
@@ -77,6 +77,7 @@ export const getJWTToken = async (wpUrl: string, adminUsername: string, adminTok
 };
 
 export const validateJWTToken = async (wpUrl: string, token: string) => {
+  console.log('Validando token JWT...');
   try {
     const response = await fetch(`${wpUrl}/wp-json/jwt-auth/v1/token/validate`, {
       method: 'POST',
@@ -86,10 +87,13 @@ export const validateJWTToken = async (wpUrl: string, token: string) => {
     });
 
     if (!response.ok) {
-      throw new Error(`Error al validar token JWT: ${response.status}`);
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Error al validar token:', response.status, errorData);
+      throw new Error(errorData.message || `Error al validar token JWT: ${response.status}`);
     }
 
     const data = await response.json();
+    console.log('Token JWT validado exitosamente');
     return data;
   } catch (error) {
     console.error('Error al validar token JWT:', error);
