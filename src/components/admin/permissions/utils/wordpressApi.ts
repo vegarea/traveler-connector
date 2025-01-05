@@ -76,18 +76,8 @@ export const loginToWordPress = async (wpUrl: string, jwtToken: string) => {
       }
     });
 
-    // Clonamos la respuesta antes de consumir el body
-    const responseClone = response.clone();
-    
-    let data;
-    try {
-      data = await response.json();
-    } catch (e) {
-      // Si falla el parsing JSON, intentamos obtener el texto
-      const textResponse = await responseClone.text();
-      console.error('Error al parsear respuesta JSON:', textResponse);
-      throw new Error(`Respuesta inválida del servidor: ${textResponse}`);
-    }
+    // Leemos la respuesta una sola vez
+    const data = await response.json();
 
     if (!response.ok) {
       console.error('Error en login de WordPress:', data);
