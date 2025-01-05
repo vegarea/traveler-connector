@@ -57,18 +57,13 @@ const Login = () => {
         // Guardar el token JWT en localStorage
         localStorage.setItem('wp_token', response.token);
         localStorage.setItem('wp_user', JSON.stringify({
-          username: values.username, // Guardamos el usuario que intenta loguearse
+          username: values.username,
           display_name: response.user_display_name,
           email: response.user_email
         }));
         
-        console.log('Redirigiendo a WordPress para autenticación del usuario...');
-        // Redirigir a WordPress con las credenciales del usuario que intenta loguearse
-        const loginUrl = new URL(`${wpConfig.wp_url}/wp-login.php`);
-        loginUrl.searchParams.append('jwt_token', response.token);
-        loginUrl.searchParams.append('username', values.username);
-        loginUrl.searchParams.append('password', values.password);
-        window.location.href = loginUrl.toString();
+        // Redirigir directamente al home de WordPress
+        window.location.href = `${wpConfig.wp_url}/wp-admin`;
       }
     } catch (error) {
       console.error('Error en login:', error);
