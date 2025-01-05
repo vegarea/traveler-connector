@@ -53,8 +53,9 @@ const Login = () => {
         
         // Validar el token antes de redirigir
         const validationResponse = await validateJWTToken(wpConfig.wp_url, response.token);
+        console.log('Respuesta de validación:', validationResponse);
         
-        if (validationResponse.data?.status === 200) {
+        if (validationResponse.code === 'jwt_auth_valid_token') {
           console.log('Token JWT validado, redirigiendo al home de WordPress...');
           window.location.href = wpConfig.wp_url;
         } else {

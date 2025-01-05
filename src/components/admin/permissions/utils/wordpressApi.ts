@@ -27,6 +27,7 @@ export const getJWTTokenWithAdminCredentials = async (wpUrl: string, adminUserna
 
     const data = await response.json();
     console.log('Token JWT obtenido exitosamente para admin');
+    console.log('Respuesta completa:', JSON.stringify(data, null, 2));
     
     return data;
   } catch (error) {
@@ -62,6 +63,7 @@ export const getJWTToken = async (wpUrl: string, adminUsername: string, adminTok
 
     const data = await response.json();
     console.log('Token JWT obtenido exitosamente para usuario:', userLogin);
+    console.log('Respuesta completa:', JSON.stringify(data, null, 2));
     
     // Guardar el token y la información del usuario en localStorage
     localStorage.setItem('wp_token', data.token);
@@ -79,6 +81,9 @@ export const getJWTToken = async (wpUrl: string, adminUsername: string, adminTok
 export const validateJWTToken = async (wpUrl: string, token: string) => {
   console.log('Validando token JWT...');
   try {
+    console.log('URL de validación:', `${wpUrl}/wp-json/jwt-auth/v1/token/validate`);
+    console.log('Token a validar:', token.substring(0, 20) + '...');
+    
     const response = await fetch(`${wpUrl}/wp-json/jwt-auth/v1/token/validate`, {
       method: 'POST',
       headers: {
@@ -86,14 +91,24 @@ export const validateJWTToken = async (wpUrl: string, token: string) => {
       }
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('Error al validar token:', response.status, errorData);
-      throw new Error(errorData.message || `Error al validar token JWT: ${response.status}`);
+    const responseText = await response.text();
+    console.log('Respuesta completa de validación:', responseText);
+
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (e) {
+      console.error('Error al parsear respuesta:', e);
+      throw new Error('Respuesta de validación inválida');
     }
 
-    const data = await response.json();
+    if (!response.ok) {
+      console.error('Error al validar token:', response.status, data);
+      throw new Error(data.message || `Error al validar token JWT: ${response.status}`);
+    }
+
     console.log('Token JWT validado exitosamente');
+    console.log('Datos de validación:', JSON.stringify(data, null, 2));
     return data;
   } catch (error) {
     console.error('Error al validar token JWT:', error);
