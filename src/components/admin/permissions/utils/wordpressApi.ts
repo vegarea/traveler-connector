@@ -123,7 +123,7 @@ export const redirectToWordPressWithToken = async (wpUrl: string, token: string)
     // Primero, creamos un formulario oculto para enviar el token de manera segura
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = `${wpUrl}/wp-login.php`;  // Cambiado a wp-login.php
+    form.action = wpUrl;  // Redirigimos directamente al home de WordPress
     form.style.display = 'none';
 
     // Agregamos el token JWT como campo oculto
@@ -139,13 +139,6 @@ export const redirectToWordPressWithToken = async (wpUrl: string, token: string)
     nonceInput.name = 'jwt_auth_nonce';
     nonceInput.value = btoa(Date.now().toString());
     form.appendChild(nonceInput);
-
-    // Agregamos el parámetro redirect_to para ir al home después del login
-    const redirectInput = document.createElement('input');
-    redirectInput.type = 'hidden';
-    redirectInput.name = 'redirect_to';
-    redirectInput.value = wpUrl;  // Redirige al home después del login
-    form.appendChild(redirectInput);
 
     // Agregamos el formulario al documento y lo enviamos
     document.body.appendChild(form);
