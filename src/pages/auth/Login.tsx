@@ -8,8 +8,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useWordPressConfig } from '@/components/wordpress/hooks/useWordPressConfig';
-import { getJWTToken, validateJWTToken } from '@/components/admin/permissions/utils/wordpressApi';
+import { getJWTToken } from '@/components/admin/permissions/utils/wordpressApi';
 import { Loader2 } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
 
 const loginSchema = z.object({
   username: z.string().min(1, "El nombre de usuario es requerido"),
@@ -20,6 +21,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const { data: wpConfig, isLoading: isConfigLoading } = useWordPressConfig();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
@@ -54,40 +56,19 @@ const Login = () => {
       console.log('Respuesta de login:', response);
 
       if (response.token) {
-        // Validar el token
-        console.log('Validando token JWT...');
-        const validationResponse = await validateJWTToken(wpConfig.wp_url, response.token);
-        console.log('Respuesta de validación:', validationResponse);
-
-        // Guardar el token
+        // Guardar el token y la información del usuario
         localStorage.setItem('wp_token', response.token);
+        localStorage.setItem('user_email', response.user_email);
+        localStorage.setItem('user_nicename', response.user_nicename);
+        localStorage.setItem('user_display_name', response.user_display_name);
         
-        // Redirigir directamente al home de WordPress
-        const wpHomeUrl = `${wpConfig.wp_url}/wp-admin/admin-ajax.php`;
-        console.log('Redirigiendo a:', wpHomeUrl);
-        
-        // Crear un formulario oculto para enviar el token como POST
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = wpHomeUrl;
-        form.style.display = 'none';
+        toast({
+          title: "¡Bienvenido!",
+          description: `Has iniciado sesión como ${response.user_display_name}`,
+        });
 
-        // Agregar el token JWT
-        const tokenInput = document.createElement('input');
-        tokenInput.type = 'hidden';
-        tokenInput.name = 'jwt_token';
-        tokenInput.value = response.token;
-        form.appendChild(tokenInput);
-
-        // Agregar la acción de WordPress
-        const actionInput = document.createElement('input');
-        actionInput.type = 'hidden';
-        actionInput.name = 'action';
-        actionInput.value = 'jwt_login';
-        form.appendChild(actionInput);
-
-        document.body.appendChild(form);
-        form.submit();
+        // Redirigir al usuario a la página principal
+        navigate('/');
       }
     } catch (error) {
       console.error('Error en login:', error);
