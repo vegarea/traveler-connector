@@ -32,7 +32,7 @@ const Login = () => {
   });
 
   const onSubmit = async (values: LoginFormValues) => {
-    if (!wpConfig?.wp_url || !wpConfig?.wp_username || !wpConfig?.wp_token) {
+    if (!wpConfig?.wp_url) {
       toast({
         title: "Error de configuración",
         description: "No se encontró la configuración de WordPress",
@@ -43,13 +43,13 @@ const Login = () => {
 
     try {
       setIsLoggingIn(true);
-      console.log('Iniciando proceso de login con JWT usando credenciales de admin...');
+      console.log('Iniciando proceso de login con JWT...');
       
-      // Obtener token JWT usando las credenciales del ADMINISTRADOR configuradas
+      // Obtener token JWT usando las credenciales del usuario que intenta loguearse
       const response = await getJWTToken(
         wpConfig.wp_url,
-        wpConfig.wp_username, // Usuario admin configurado
-        wpConfig.wp_token    // Contraseña del admin configurada
+        values.username,
+        values.password
       );
 
       if (response.token) {
@@ -57,18 +57,14 @@ const Login = () => {
         // Guardar el token JWT en localStorage
         localStorage.setItem('wp_token', response.token);
         localStorage.setItem('wp_user', JSON.stringify({
-          username: values.username, // Guardamos el usuario que intenta loguearse
+          username: values.username,
           display_name: response.user_display_name,
           email: response.user_email
         }));
         
-        console.log('Redirigiendo a WordPress para autenticación del usuario...');
-        // Redirigir a WordPress con las credenciales del usuario que intenta loguearse
-        const loginUrl = new URL(`${wpConfig.wp_url}/wp-login.php`);
-        loginUrl.searchParams.append('jwt_token', response.token);
-        loginUrl.searchParams.append('username', values.username);
-        loginUrl.searchParams.append('password', values.password);
-        window.location.href = loginUrl.toString();
+        console.log('Redirigiendo al home de WordPress...');
+        // Redirigir directamente al home de WordPress
+        window.location.href = wpConfig.wp_url;
       }
     } catch (error) {
       console.error('Error en login:', error);
