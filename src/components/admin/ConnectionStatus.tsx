@@ -8,9 +8,10 @@ export const ConnectionStatus = () => {
 
   const handleTestConnection = async () => {
     try {
+      const token = localStorage.getItem('wp_token');
       const response = await fetch(`${import.meta.env.VITE_WORDPRESS_URL}/wp-json`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('wp_token')}`
+          'Authorization': token ? `Bearer ${token}` : ''
         }
       });
       
