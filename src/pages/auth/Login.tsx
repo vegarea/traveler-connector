@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import { useWordPressConfig } from '@/components/wordpress/hooks/useWordPressConfig';
-import { getJWTToken, validateJWTToken } from '@/components/admin/permissions/utils/wordpressApi';
+import { getJWTToken, validateJWTToken, redirectToWordPressWithToken } from '@/components/admin/permissions/utils/wordpressApi';
 import { Loader2 } from "lucide-react";
 import { loginSchema, type LoginFormValues } from '@/components/admin/forms/types';
 
@@ -56,8 +56,9 @@ const Login = () => {
         console.log('Respuesta de validación:', validationResponse);
         
         if (validationResponse.code === 'jwt_auth_valid_token') {
-          console.log('Token JWT validado, redirigiendo al home de WordPress...');
-          window.location.href = wpConfig.wp_url;
+          console.log('Token JWT validado, redirigiendo a WordPress con token...');
+          // Usar la nueva función de redirección que mantiene la sesión
+          await redirectToWordPressWithToken(wpConfig.wp_url, response.token);
         } else {
           throw new Error('Token JWT inválido');
         }

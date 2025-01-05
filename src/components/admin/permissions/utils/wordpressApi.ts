@@ -115,3 +115,37 @@ export const validateJWTToken = async (wpUrl: string, token: string) => {
     throw error;
   }
 };
+
+export const redirectToWordPressWithToken = async (wpUrl: string, token: string) => {
+  console.log('Redirigiendo a WordPress con token JWT...');
+  
+  try {
+    // Primero, creamos un formulario oculto para enviar el token de manera segura
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `${wpUrl}/wp-admin/`;
+    form.style.display = 'none';
+
+    // Agregamos el token JWT como campo oculto
+    const tokenInput = document.createElement('input');
+    tokenInput.type = 'hidden';
+    tokenInput.name = 'jwt_token';
+    tokenInput.value = token;
+    form.appendChild(tokenInput);
+
+    // Agregamos un nonce para seguridad adicional
+    const nonceInput = document.createElement('input');
+    nonceInput.type = 'hidden';
+    nonceInput.name = 'jwt_auth_nonce';
+    nonceInput.value = btoa(Date.now().toString());
+    form.appendChild(nonceInput);
+
+    // Agregamos el formulario al documento y lo enviamos
+    document.body.appendChild(form);
+    console.log('Enviando formulario con token JWT a WordPress...');
+    form.submit();
+  } catch (error) {
+    console.error('Error al redirigir a WordPress:', error);
+    throw new Error('Error al redirigir a WordPress con el token JWT');
+  }
+};
