@@ -55,28 +55,8 @@ const Login = () => {
       if (response.token) {
         console.log('Token JWT obtenido, redirigiendo a WordPress...');
         
-        // Redirigir a WordPress con el token en el header de Authorization
-        const redirectUrl = `${wpConfig.wp_url}/wp-admin/admin-ajax.php`;
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = redirectUrl;
-        
-        // Agregar el token como campo oculto
-        const tokenInput = document.createElement('input');
-        tokenInput.type = 'hidden';
-        tokenInput.name = 'jwt_token';
-        tokenInput.value = response.token;
-        form.appendChild(tokenInput);
-        
-        // Agregar la acción de WordPress
-        const actionInput = document.createElement('input');
-        actionInput.type = 'hidden';
-        actionInput.name = 'action';
-        actionInput.value = 'jwt_auth_login';
-        form.appendChild(actionInput);
-        
-        document.body.appendChild(form);
-        form.submit();
+        // Redirigir a WordPress con el token
+        window.location.href = `${wpConfig.wp_url}?jwt_token=${response.token}`;
       }
     } catch (error) {
       console.error('Error en login:', error);
