@@ -9,16 +9,11 @@ import { useToast } from "@/hooks/use-toast";
 import { testUserSchema, TestUserFormValues } from './wordpress/types';
 import { useWordPressUser } from './wordpress/useWordPressUser';
 import { useLocalUser } from './wordpress/useLocalUser';
-import { useWordPressConfig } from '@/components/wordpress/hooks/useWordPressConfig';
-import { getJWTToken } from '@/components/admin/permissions/utils/wordpressApi';
-import { Loader2 } from "lucide-react";
 
 export const TestUserCreationForm = () => {
   const { toast } = useToast();
   const { createWordPressUser } = useWordPressUser();
   const { createLocalUser } = useLocalUser();
-  const { data: wpConfig } = useWordPressConfig();
-  const [isLoading, setIsLoading] = React.useState(false);
 
   const form = useForm<TestUserFormValues>({
     resolver: zodResolver(testUserSchema),
@@ -31,54 +26,12 @@ export const TestUserCreationForm = () => {
 
   const onSubmit = async (values: TestUserFormValues) => {
     try {
-      setIsLoading(true);
-      
       // 1. Crear usuario en WordPress
       const wpUser = await createWordPressUser(values);
       console.log('Usuario WordPress creado:', wpUser);
 
       // 2. Crear usuario en nuestra base de datos
       await createLocalUser(values, wpUser.id);
-
-      // 3. Obtener token JWT
-      if (wpConfig?.wp_url) {
-        const jwtResponse = await getJWTToken(
-          wpConfig.wp_url,
-          values.username,
-          values.password
-        );
-
-        if (jwtResponse.token) {
-          toast({
-            title: "Usuario creado exitosamente",
-            description: `Usuario ${values.username} creado correctamente`,
-          });
-          
-          // Crear un formulario oculto para enviar el token a WordPress
-          const form = document.createElement('form');
-          form.method = 'POST';
-          form.action = `${wpConfig.wp_url}/wp-admin/admin-ajax.php`;
-          
-          // Añadir el token como campo oculto
-          const tokenInput = document.createElement('input');
-          tokenInput.type = 'hidden';
-          tokenInput.name = 'token';
-          tokenInput.value = jwtResponse.token;
-          form.appendChild(tokenInput);
-          
-          // Añadir la acción como campo oculto
-          const actionInput = document.createElement('input');
-          actionInput.type = 'hidden';
-          actionInput.name = 'action';
-          actionInput.value = 'jwt_auth_login';
-          form.appendChild(actionInput);
-          
-          // Añadir el formulario al documento y enviarlo
-          document.body.appendChild(form);
-          form.submit();
-          return;
-        }
-      }
 
       toast({
         title: "Usuario creado exitosamente",
@@ -93,15 +46,13 @@ export const TestUserCreationForm = () => {
         description: error instanceof Error ? error.message : "Error desconocido",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>Registro de Usuario</CardTitle>
+        <CardTitle>Prueba de Creación de Usuario</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -148,19 +99,8 @@ export const TestUserCreationForm = () => {
               )}
             />
 
-            <Button 
-              type="submit" 
-              className="w-full"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creando usuario...
-                </>
-              ) : (
-                'Crear Usuario'
-              )}
+            <Button type="submit" className="w-full">
+              Crear Usuario
             </Button>
           </form>
         </Form>
