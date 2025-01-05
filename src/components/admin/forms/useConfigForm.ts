@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { configSchema, ConfigFormValues } from './types';
 import { useEffect, useState } from "react";
-import { getJWTToken, validateJWTToken } from "../permissions/utils/wordpressApi";
+import { getJWTTokenWithAdminCredentials, validateJWTToken } from "../permissions/utils/wordpressApi";
 
 interface ConnectionInfo {
   user_display_name: string;
@@ -82,7 +82,7 @@ export const useConfigForm = () => {
       // No mostramos la contraseña en los logs
       console.log('Usando contraseña normal para JWT (no contraseña de aplicación)');
 
-      const jwtResponse = await getJWTToken(
+      const jwtResponse = await getJWTTokenWithAdminCredentials(
         configToTest.wp_url,
         configToTest.wp_username,
         configToTest.wp_token
