@@ -45,23 +45,21 @@ const Login = () => {
       setIsLoggingIn(true);
       console.log('Iniciando proceso de login con JWT...');
       
-      // Obtener token JWT para el usuario
+      // Obtener token JWT usando las credenciales del usuario
       const response = await getJWTToken(
         wpConfig.wp_url,
-        values.username,    // Username del usuario que intenta login
-        values.password     // Password del usuario que intenta login
+        values.username,
+        values.password
       );
 
       if (response.token) {
-        console.log('Token JWT obtenido para el usuario, guardando en localStorage...');
+        console.log('Token JWT obtenido, validando...');
 
         // Validar el token antes de redirigir
-        console.log('Validando token JWT del usuario...');
         const validationResponse = await validateJWTToken(wpConfig.wp_url, response.token);
         
         if (validationResponse.data?.status === 200) {
-          console.log('Token JWT del usuario validado, redirigiendo al home de WordPress...');
-          // Redirigir al home de WordPress después de validar el token
+          console.log('Token JWT validado, redirigiendo al home de WordPress...');
           window.location.href = wpConfig.wp_url;
         } else {
           throw new Error('Token JWT inválido');
