@@ -13,10 +13,11 @@ export const getJWTToken = async (wpUrl: string, username: string, password: str
       'Content-Type': 'application/json'
     };
 
-    // Si se proporcionan credenciales de admin, usarlas para la autenticación
+    // Si se proporcionan credenciales de admin, usarlas para la autenticación básica
+    // Importante: Usamos la contraseña normal del admin, NO la contraseña de aplicación
     if (adminUsername && adminToken) {
       headers['Authorization'] = createAuthHeader(adminUsername, adminToken);
-      console.log('Usando autenticación de admin para la petición');
+      console.log('Usando autenticación de admin (contraseña normal) para la petición JWT');
     }
 
     const response = await fetch(`${wpUrl}/wp-json/jwt-auth/v1/token`, {

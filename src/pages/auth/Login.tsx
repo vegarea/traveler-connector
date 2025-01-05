@@ -45,13 +45,14 @@ const Login = () => {
       setIsLoggingIn(true);
       console.log('Iniciando proceso de login con JWT usando credenciales de admin...');
       
-      // Obtener token JWT para el USUARIO usando las credenciales del ADMIN para hacer la petición
+      // Obtener token JWT para el USUARIO usando las credenciales del ADMIN
+      // Importante: Usamos wp_token (contraseña normal) para la autenticación JWT
       const response = await getJWTToken(
         wpConfig.wp_url,
         values.username,    // Username del USUARIO que intenta login
         values.password,    // Password del USUARIO que intenta login
         wpConfig.wp_username, // Username del ADMIN para autenticación
-        wpConfig.wp_token    // Token del ADMIN para autenticación
+        wpConfig.wp_token    // Contraseña normal del ADMIN para autenticación JWT
       );
 
       if (response.token) {
