@@ -50,21 +50,21 @@ const Login = () => {
       console.log('Intentando obtener token JWT de WordPress...');
       console.log('URL de WordPress:', wpConfig.wp_url);
       
+      // Primero obtenemos el token JWT
       const response = await getJWTToken(
         wpConfig.wp_url,
         values.username,
         values.password
       );
 
-      console.log('Respuesta del token JWT:', response);
-
       if (response.token) {
         console.log('Token JWT obtenido exitosamente');
-        // Guardar el token para futuras peticiones a la API
-        localStorage.setItem('wp_token', response.token);
         
-        console.log('Preparando formulario para login en WordPress...');
-        // Redirigir a WordPress con el token
+        // Construir la URL de redirección
+        const redirectUrl = `${wpConfig.auth_callback_url}?token=${response.token}`;
+        console.log('URL de redirección:', redirectUrl);
+        
+        // Redirigir a WordPress con los parámetros correctos
         const wpLoginUrl = `${wpConfig.wp_url}/wp-login.php`;
         console.log('URL de login de WordPress:', wpLoginUrl);
         
@@ -89,7 +89,7 @@ const Login = () => {
         const redirectInput = document.createElement('input');
         redirectInput.type = 'hidden';
         redirectInput.name = 'redirect_to';
-        redirectInput.value = wpConfig.wp_url; // Cambiado para redirigir al home en lugar de wp-admin
+        redirectInput.value = redirectUrl;
         form.appendChild(redirectInput);
 
         console.log('Formulario preparado, enviando...');
