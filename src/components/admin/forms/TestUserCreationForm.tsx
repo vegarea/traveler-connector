@@ -40,7 +40,7 @@ export const TestUserCreationForm = () => {
       // 2. Crear usuario en nuestra base de datos
       await createLocalUser(values, wpUser.id);
 
-      // 3. Obtener token JWT y redirigir a WordPress
+      // 3. Obtener token JWT
       if (wpConfig?.wp_url) {
         const jwtResponse = await getJWTToken(
           wpConfig.wp_url,
@@ -49,28 +49,14 @@ export const TestUserCreationForm = () => {
         );
 
         if (jwtResponse.token) {
-          // Crear un formulario oculto para enviar el token a WordPress
-          const form = document.createElement('form');
-          form.method = 'POST';
-          form.action = `${wpConfig.wp_url}/wp-admin/admin-ajax.php`;
+          toast({
+            title: "Usuario creado exitosamente",
+            description: `Usuario ${values.username} creado correctamente`,
+          });
           
-          // Añadir el token como campo oculto
-          const tokenInput = document.createElement('input');
-          tokenInput.type = 'hidden';
-          tokenInput.name = 'token';
-          tokenInput.value = jwtResponse.token;
-          form.appendChild(tokenInput);
-          
-          // Añadir la acción como campo oculto
-          const actionInput = document.createElement('input');
-          actionInput.type = 'hidden';
-          actionInput.name = 'action';
-          actionInput.value = 'jwt_auth_login';
-          form.appendChild(actionInput);
-          
-          // Añadir el formulario al documento y enviarlo
-          document.body.appendChild(form);
-          form.submit();
+          // Guardar token y redirigir
+          localStorage.setItem('wp_token', jwtResponse.token);
+          window.location.href = `/u/${values.username}`;
           return;
         }
       }
