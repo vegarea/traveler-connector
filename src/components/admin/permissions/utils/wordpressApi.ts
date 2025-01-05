@@ -67,11 +67,11 @@ export const loginToWordPress = async (wpUrl: string, jwtToken: string) => {
       }
     });
 
-    // Primero guardamos el texto de la respuesta
+    // Guardamos la respuesta en una variable
     const responseText = await response.text();
     console.log('Respuesta del login:', responseText);
 
-    // Intentamos parsear el texto como JSON
+    // Intentamos parsear la respuesta como JSON
     let data;
     try {
       data = JSON.parse(responseText);
