@@ -80,7 +80,7 @@ const Login = () => {
         const redirectInput = document.createElement('input');
         redirectInput.type = 'hidden';
         redirectInput.name = 'redirect_to';
-        redirectInput.value = `${wpConfig.wp_url}/wp-admin/`;
+        redirectInput.value = wpConfig.wp_url; // Cambiado para redirigir al home en lugar de wp-admin
         form.appendChild(redirectInput);
 
         document.body.appendChild(form);
