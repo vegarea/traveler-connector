@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -67,13 +67,9 @@ const Login = () => {
         const validationResponse = await validateJWTToken(wpConfig.wp_url, response.token);
         
         if (validationResponse.data?.status === 200) {
-          console.log('Token JWT validado, redirigiendo a WordPress...');
-          // Redirigir a WordPress con las credenciales del usuario
-          const loginUrl = new URL(`${wpConfig.wp_url}/wp-login.php`);
-          loginUrl.searchParams.append('jwt_token', response.token);
-          loginUrl.searchParams.append('username', values.username);
-          loginUrl.searchParams.append('password', values.password);
-          window.location.href = loginUrl.toString();
+          console.log('Token JWT validado, redirigiendo al home de WordPress...');
+          // Redirigir al home de WordPress después de validar el token
+          window.location.href = wpConfig.wp_url;
         } else {
           throw new Error('Token JWT inválido');
         }
