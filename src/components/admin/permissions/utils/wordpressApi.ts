@@ -1,79 +1,32 @@
-const createAuthHeader = (username: string, token: string) => {
+export const createAuthHeader = (username: string, token: string) => {
   return `Basic ${btoa(`${username}:${token}`)}`;
 };
 
-export const getJWTTokenWithAdminCredentials = async (wpUrl: string, adminUsername: string, adminToken: string) => {
-  console.log('Obteniendo token JWT usando credenciales de admin...');
+export const getJWTToken = async (wpUrl: string, username: string, password: string) => {
+  console.log('Obteniendo token JWT...');
   try {
-    console.log('URL:', wpUrl);
-    console.log('Usuario admin que solicita token:', adminUsername);
-    
     const response = await fetch(`${wpUrl}/wp-json/jwt-auth/v1/token`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        username: adminUsername,
-        password: adminToken
+        username,
+        password
       })
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('Error en la respuesta:', response.status, errorData);
-      throw new Error(errorData.message || `Error al obtener token JWT: ${response.status}`);
+      const errorData = await response.json();
+      console.error('Error al obtener token JWT:', errorData);
+      throw new Error(errorData.message || 'Error al obtener token JWT');
     }
 
     const data = await response.json();
-    console.log('Token JWT obtenido exitosamente para admin');
-    console.log('Respuesta completa:', JSON.stringify(data, null, 2));
-    
+    console.log('Token JWT obtenido exitosamente:', data);
     return data;
   } catch (error) {
-    console.error('Error al obtener token JWT:', error);
-    throw error;
-  }
-};
-
-export const getJWTToken = async (wpUrl: string, adminUsername: string, adminToken: string, userLogin: string, userPassword: string) => {
-  console.log('Obteniendo token JWT para usuario usando credenciales de admin...');
-  try {
-    console.log('URL:', wpUrl);
-    console.log('Usuario admin que autoriza:', adminUsername);
-    console.log('Usuario que intenta login:', userLogin);
-    
-    const response = await fetch(`${wpUrl}/wp-json/jwt-auth/v1/token`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': createAuthHeader(adminUsername, adminToken)
-      },
-      body: JSON.stringify({
-        username: userLogin,
-        password: userPassword
-      })
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('Error en la respuesta:', response.status, errorData);
-      throw new Error(errorData.message || `Error al obtener token JWT: ${response.status}`);
-    }
-
-    const data = await response.json();
-    console.log('Token JWT obtenido exitosamente para usuario:', userLogin);
-    console.log('Respuesta completa:', JSON.stringify(data, null, 2));
-    
-    // Guardar el token y la información del usuario en localStorage
-    localStorage.setItem('wp_token', data.token);
-    localStorage.setItem('wp_user_email', data.user_email);
-    localStorage.setItem('wp_user_nicename', data.user_nicename);
-    localStorage.setItem('wp_user_display_name', data.user_display_name);
-    
-    return data;
-  } catch (error) {
-    console.error('Error al obtener token JWT:', error);
+    console.error('Error en la solicitud JWT:', error);
     throw error;
   }
 };
@@ -81,9 +34,6 @@ export const getJWTToken = async (wpUrl: string, adminUsername: string, adminTok
 export const validateJWTToken = async (wpUrl: string, token: string) => {
   console.log('Validando token JWT...');
   try {
-    console.log('URL de validación:', `${wpUrl}/wp-json/jwt-auth/v1/token/validate`);
-    console.log('Token a validar:', token.substring(0, 20) + '...');
-    
     const response = await fetch(`${wpUrl}/wp-json/jwt-auth/v1/token/validate`, {
       method: 'POST',
       headers: {
@@ -91,50 +41,85 @@ export const validateJWTToken = async (wpUrl: string, token: string) => {
       }
     });
 
-    const responseText = await response.text();
-    console.log('Respuesta completa de validación:', responseText);
-
-    let data;
-    try {
-      data = JSON.parse(responseText);
-    } catch (e) {
-      console.error('Error al parsear respuesta:', e);
-      throw new Error('Respuesta de validación inválida');
-    }
-
     if (!response.ok) {
-      console.error('Error al validar token:', response.status, data);
-      throw new Error(data.message || `Error al validar token JWT: ${response.status}`);
+      const errorData = await response.json();
+      console.error('Error al validar token JWT:', errorData);
+      throw new Error(errorData.message || 'Token JWT inválido');
     }
 
-    console.log('Token JWT validado exitosamente');
-    console.log('Datos de validación:', JSON.stringify(data, null, 2));
+    const data = await response.json();
+    console.log('Token JWT validado exitosamente:', data);
     return data;
   } catch (error) {
-    console.error('Error al validar token JWT:', error);
+    console.error('Error en la validación JWT:', error);
     throw error;
   }
 };
 
-export const redirectToWordPressWithToken = async (wpUrl: string, token: string) => {
-  console.log('Redirigiendo a WordPress con token JWT...');
-  console.log('URL de WordPress:', wpUrl);
-  console.log('Token JWT (primeros 20 caracteres):', token.substring(0, 20) + '...');
-  
+export const checkEndpoint = async (endpoint: string, wpUrl: string, wpUsername: string, wpToken: string) => {
+  console.log(`Verificando endpoint: ${endpoint}`);
   try {
-    // Primero validamos que el token sea válido
-    await validateJWTToken(wpUrl, token);
+    // Primero obtenemos un token JWT usando las credenciales
+    const jwtResponse = await getJWTToken(wpUrl, wpUsername, wpToken);
+    console.log('Token JWT obtenido para endpoint:', endpoint);
     
-    // Creamos una URL con el token como parámetro de autenticación
-    const url = new URL(wpUrl);
-    url.searchParams.append('auth_token', token);
+    // Usamos el token JWT para la verificación del endpoint
+    const response = await fetch(`${wpUrl}/wp-json${endpoint}`, {
+      headers: {
+        'Authorization': `Bearer ${jwtResponse.token}`,
+        'Content-Type': 'application/json'
+      }
+    });
     
-    console.log('Redirigiendo a:', url.toString());
-    
-    // Redirigimos usando window.location para mantener el token en la URL
-    window.location.href = url.toString();
+    console.log(`Respuesta del endpoint ${endpoint}:`, {
+      status: response.status,
+      ok: response.ok,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      console.error(`Error en endpoint ${endpoint}:`, {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorData
+      });
+    }
+
+    return response.ok;
   } catch (error) {
-    console.error('Error al redirigir a WordPress:', error);
-    throw new Error('Error al redirigir a WordPress con el token JWT');
+    console.error(`Error al verificar endpoint ${endpoint}:`, error);
+    return false;
+  }
+};
+
+export const fetchUserStructure = async (wpUrl: string, wpUsername: string, wpToken: string) => {
+  try {
+    // Primero obtenemos un token JWT usando las credenciales
+    const jwtResponse = await getJWTToken(wpUrl, wpUsername, wpToken);
+    console.log('Token JWT obtenido para estructura de usuario');
+    
+    const response = await fetch(`${wpUrl}/wp-json/wp/v2/users/me`, {
+      headers: {
+        'Authorization': `Bearer ${jwtResponse.token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      console.error('Error al obtener estructura de usuario:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorData
+      });
+      throw new Error('No se pudo obtener la estructura de usuarios');
+    }
+
+    const data = await response.json();
+    console.log('Estructura de usuario obtenida:', data);
+    return data;
+  } catch (error) {
+    console.error('Error al obtener estructura de usuario:', error);
+    throw error;
   }
 };

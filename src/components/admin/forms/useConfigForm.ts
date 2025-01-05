@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { configSchema, ConfigFormValues } from './types';
 import { useEffect, useState } from "react";
-import { getJWTTokenWithAdminCredentials, validateJWTToken } from "../permissions/utils/wordpressApi";
+import { getJWTToken, validateJWTToken } from "../permissions/utils/wordpressApi";
 
 interface ConnectionInfo {
   user_display_name: string;
@@ -46,12 +46,6 @@ export const useConfigForm = () => {
 
       if (data && data.length > 0) {
         const config = data[0];
-        console.log('Configuración de WordPress cargada:', {
-          ...config,
-          wp_token: '[REDACTED]',
-          wp_api_token: '[REDACTED]'
-        });
-        
         form.reset({
           wp_url: config.wp_url,
           wp_username: config.wp_username,
@@ -78,15 +72,15 @@ export const useConfigForm = () => {
       console.log('Iniciando prueba de conexión con WordPress usando JWT...');
       console.log('URL:', configToTest.wp_url);
       console.log('Usuario:', configToTest.wp_username);
-      console.log('Usando contraseña normal para JWT (no contraseña de aplicación)');
 
-      const jwtResponse = await getJWTTokenWithAdminCredentials(
+      // Obtener token JWT usando usuario y contraseña
+      const jwtResponse = await getJWTToken(
         configToTest.wp_url,
         configToTest.wp_username,
         configToTest.wp_token
       );
 
-      console.log('Token JWT obtenido exitosamente');
+      console.log('Respuesta JWT:', jwtResponse);
 
       // Validar el token JWT
       await validateJWTToken(configToTest.wp_url, jwtResponse.token);
