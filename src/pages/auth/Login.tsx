@@ -10,7 +10,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useWordPressConfig } from '@/components/wordpress/hooks/useWordPressConfig';
 import { getJWTToken } from '@/components/admin/permissions/utils/wordpressApi';
 import { Loader2 } from "lucide-react";
-import { useNavigate } from 'react-router-dom';
 
 const loginSchema = z.object({
   username: z.string().min(1, "El nombre de usuario es requerido"),
@@ -21,7 +20,6 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login = () => {
   const { toast } = useToast();
-  const navigate = useNavigate();
   const { data: wpConfig, isLoading: isConfigLoading } = useWordPressConfig();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
@@ -56,19 +54,37 @@ const Login = () => {
       console.log('Respuesta de login:', response);
 
       if (response.token) {
-        // Guardar el token y la información del usuario
+        // Guardar el token para futuras peticiones a la API
         localStorage.setItem('wp_token', response.token);
-        localStorage.setItem('user_email', response.user_email);
-        localStorage.setItem('user_nicename', response.user_nicename);
-        localStorage.setItem('user_display_name', response.user_display_name);
         
-        toast({
-          title: "¡Bienvenido!",
-          description: `Has iniciado sesión como ${response.user_display_name}`,
-        });
+        // Redirigir a WordPress con el token
+        const wpLoginUrl = `${wpConfig.wp_url}/wp-login.php`;
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = wpLoginUrl;
+        form.style.display = 'none';
 
-        // Redirigir al usuario a la página principal
-        navigate('/');
+        // Agregar los campos necesarios
+        const usernameInput = document.createElement('input');
+        usernameInput.type = 'hidden';
+        usernameInput.name = 'log';
+        usernameInput.value = values.username;
+        form.appendChild(usernameInput);
+
+        const passwordInput = document.createElement('input');
+        passwordInput.type = 'hidden';
+        passwordInput.name = 'pwd';
+        passwordInput.value = values.password;
+        form.appendChild(passwordInput);
+
+        const redirectInput = document.createElement('input');
+        redirectInput.type = 'hidden';
+        redirectInput.name = 'redirect_to';
+        redirectInput.value = `${wpConfig.wp_url}/wp-admin/`;
+        form.appendChild(redirectInput);
+
+        document.body.appendChild(form);
+        form.submit();
       }
     } catch (error) {
       console.error('Error en login:', error);
