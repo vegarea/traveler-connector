@@ -76,8 +76,9 @@ export const loginToWordPress = async (wpUrl: string, jwtToken: string) => {
       }
     });
 
-    // Leemos la respuesta una sola vez
+    // Leemos la respuesta una sola vez y la almacenamos
     const data = await response.json();
+    console.log('Respuesta del login:', data);
 
     if (!response.ok) {
       console.error('Error en login de WordPress:', data);
