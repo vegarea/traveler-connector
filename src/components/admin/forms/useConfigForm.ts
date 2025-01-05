@@ -46,6 +46,13 @@ export const useConfigForm = () => {
 
       if (data && data.length > 0) {
         const config = data[0];
+        // No mostramos datos sensibles en los logs
+        console.log('Configuración de WordPress cargada:', {
+          ...config,
+          wp_token: '[REDACTED]',
+          wp_api_token: '[REDACTED]'
+        });
+        
         form.reset({
           wp_url: config.wp_url,
           wp_username: config.wp_username,
@@ -72,15 +79,16 @@ export const useConfigForm = () => {
       console.log('Iniciando prueba de conexión con WordPress usando JWT...');
       console.log('URL:', configToTest.wp_url);
       console.log('Usuario:', configToTest.wp_username);
+      // No mostramos la contraseña en los logs
+      console.log('Usando contraseña normal para JWT (no contraseña de aplicación)');
 
-      // IMPORTANTE: Usamos wp_token (contraseña normal) para JWT, NO wp_api_token
       const jwtResponse = await getJWTToken(
         configToTest.wp_url,
         configToTest.wp_username,
-        configToTest.wp_token // Usamos la contraseña normal para JWT
+        configToTest.wp_token
       );
 
-      console.log('Respuesta JWT:', jwtResponse);
+      console.log('Token JWT obtenido exitosamente');
 
       // Validar el token JWT
       await validateJWTToken(configToTest.wp_url, jwtResponse.token);
@@ -125,8 +133,8 @@ export const useConfigForm = () => {
         .upsert({
           wp_url: values.wp_url,
           wp_username: values.wp_username,
-          wp_token: values.wp_token, // Contraseña normal para JWT
-          wp_api_token: values.wp_api_token, // Contraseña de aplicación para API
+          wp_token: values.wp_token,
+          wp_api_token: values.wp_api_token,
           sync_users: values.sync_users,
           sync_interval: values.sync_interval,
           auth_callback_url: values.auth_callback_url,

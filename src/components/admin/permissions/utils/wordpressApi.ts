@@ -7,6 +7,7 @@ export const getJWTToken = async (wpUrl: string, username: string, password: str
   try {
     console.log('Haciendo solicitud a:', `${wpUrl}/wp-json/jwt-auth/v1/token`);
     console.log('Usuario:', username);
+    // No mostramos la contraseña en los logs
     
     const response = await fetch(`${wpUrl}/wp-json/jwt-auth/v1/token`, {
       method: 'POST',
