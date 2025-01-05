@@ -2,11 +2,11 @@ export const createAuthHeader = (username: string, token: string) => {
   return `Basic ${btoa(`${username}:${token}`)}`;
 };
 
-export const getJWTToken = async (wpUrl: string, username: string, password: string) => {
+export const getJWTToken = async (wpUrl: string, wp_username: string, wp_token: string) => {
   console.log('Obteniendo token JWT...');
   try {
     console.log('Haciendo solicitud a:', `${wpUrl}/wp-json/jwt-auth/v1/token`);
-    console.log('Usuario que intenta login:', username);
+    console.log('Usuario admin que solicita token:', wp_username);
     
     const response = await fetch(`${wpUrl}/wp-json/jwt-auth/v1/token`, {
       method: 'POST',
@@ -14,8 +14,8 @@ export const getJWTToken = async (wpUrl: string, username: string, password: str
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        username,
-        password
+        username: wp_username,
+        password: wp_token
       })
     });
 
