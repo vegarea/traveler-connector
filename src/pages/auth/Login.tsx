@@ -63,7 +63,7 @@ const Login = () => {
         localStorage.setItem('wp_token', response.token);
         
         // Redirigir directamente al home de WordPress
-        const wpHomeUrl = `${wpConfig.wp_url}/wp-admin/profile.php`;
+        const wpHomeUrl = `${wpConfig.wp_url}/wp-admin/admin-ajax.php`;
         console.log('Redirigiendo a:', wpHomeUrl);
         
         // Crear un formulario oculto para enviar el token como POST
@@ -72,11 +72,19 @@ const Login = () => {
         form.action = wpHomeUrl;
         form.style.display = 'none';
 
+        // Agregar el token JWT
         const tokenInput = document.createElement('input');
         tokenInput.type = 'hidden';
         tokenInput.name = 'jwt_token';
         tokenInput.value = response.token;
         form.appendChild(tokenInput);
+
+        // Agregar la acción de WordPress
+        const actionInput = document.createElement('input');
+        actionInput.type = 'hidden';
+        actionInput.name = 'action';
+        actionInput.value = 'jwt_login';
+        form.appendChild(actionInput);
 
         document.body.appendChild(form);
         form.submit();
