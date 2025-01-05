@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -21,7 +20,6 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login = () => {
   const { toast } = useToast();
-  const navigate = useNavigate();
   const { data: wpConfig, isLoading: isConfigLoading } = useWordPressConfig();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
@@ -55,16 +53,10 @@ const Login = () => {
       );
 
       if (response.token) {
-        // Guardar token JWT
-        localStorage.setItem('wp_token', response.token);
+        console.log('Token JWT obtenido, redirigiendo a WordPress...');
         
-        toast({
-          title: "¡Bienvenido!",
-          description: `Has iniciado sesión como ${values.username}`,
-        });
-
-        // Redirigir al perfil del usuario
-        navigate(`/u/${values.username}`);
+        // Redirigir a WordPress con el token
+        window.location.href = `${wpConfig.wp_url}?jwt_token=${response.token}`;
       }
     } catch (error) {
       console.error('Error en login:', error);
