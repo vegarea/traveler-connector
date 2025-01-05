@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useWordPressConfig } from '@/components/wordpress/hooks/useWordPressConfig';
-import { getJWTToken } from '@/components/admin/permissions/utils/wordpressApi';
+import { getJWTToken, loginToWordPress } from '@/components/admin/permissions/utils/wordpressApi';
 import { Loader2 } from "lucide-react";
 
 const loginSchema = z.object({
@@ -46,19 +46,25 @@ const Login = () => {
       console.log('Iniciando proceso de login con JWT...');
       
       // Obtener token JWT
-      const response = await getJWTToken(
+      const jwtResponse = await getJWTToken(
         wpConfig.wp_url,
         values.username,
         values.password
       );
 
-      if (response.token) {
-        console.log('Token JWT obtenido, redirigiendo a WordPress...');
+      if (jwtResponse.token) {
+        console.log('Token JWT obtenido, iniciando sesión en WordPress...');
         
-        // Redirigir a WordPress con el token como parámetro jwt_token
-        const redirectUrl = `${wpConfig.wp_url}?jwt_token=${response.token}`;
-        console.log('Redirigiendo a:', redirectUrl);
-        window.location.href = redirectUrl;
+        // Usar el nuevo endpoint del plugin para iniciar sesión
+        const loginResponse = await loginToWordPress(wpConfig.wp_url, jwtResponse.token);
+        
+        if (loginResponse.success) {
+          console.log('Sesión iniciada en WordPress, redirigiendo...');
+          // Redirigir a WordPress después de iniciar sesión exitosamente
+          window.location.href = wpConfig.wp_url;
+        } else {
+          throw new Error('No se pudo iniciar sesión en WordPress');
+        }
       }
     } catch (error) {
       console.error('Error en login:', error);
