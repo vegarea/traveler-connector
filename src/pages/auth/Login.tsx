@@ -32,7 +32,11 @@ const Login = () => {
   });
 
   const onSubmit = async (values: LoginFormValues) => {
+    console.log('Iniciando proceso de login...');
+    console.log('Valores del formulario:', { username: values.username, password: '***' });
+    
     if (!wpConfig?.wp_url) {
+      console.error('No se encontró la configuración de WordPress:', wpConfig);
       toast({
         title: "Error",
         description: "No se encontró la configuración de WordPress",
@@ -43,7 +47,8 @@ const Login = () => {
 
     try {
       setIsLoggingIn(true);
-      console.log('Intentando login con WordPress...');
+      console.log('Intentando obtener token JWT de WordPress...');
+      console.log('URL de WordPress:', wpConfig.wp_url);
       
       const response = await getJWTToken(
         wpConfig.wp_url,
@@ -51,14 +56,18 @@ const Login = () => {
         values.password
       );
 
-      console.log('Respuesta de login:', response);
+      console.log('Respuesta del token JWT:', response);
 
       if (response.token) {
+        console.log('Token JWT obtenido exitosamente');
         // Guardar el token para futuras peticiones a la API
         localStorage.setItem('wp_token', response.token);
         
+        console.log('Preparando formulario para login en WordPress...');
         // Redirigir a WordPress con el token
         const wpLoginUrl = `${wpConfig.wp_url}/wp-login.php`;
+        console.log('URL de login de WordPress:', wpLoginUrl);
+        
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = wpLoginUrl;
@@ -83,11 +92,16 @@ const Login = () => {
         redirectInput.value = wpConfig.wp_url; // Cambiado para redirigir al home en lugar de wp-admin
         form.appendChild(redirectInput);
 
+        console.log('Formulario preparado, enviando...');
         document.body.appendChild(form);
         form.submit();
       }
     } catch (error) {
-      console.error('Error en login:', error);
+      console.error('Error detallado en login:', error);
+      if (error instanceof Error) {
+        console.error('Mensaje de error:', error.message);
+        console.error('Stack trace:', error.stack);
+      }
       toast({
         title: "Error de autenticación",
         description: error instanceof Error ? error.message : "Error al intentar iniciar sesión",
