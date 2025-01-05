@@ -54,31 +54,6 @@ export const validateJWTToken = async (wpUrl: string, token: string) => {
   }
 };
 
-export const getCurrentUser = async (wpUrl: string, token: string) => {
-  console.log('Obteniendo información del usuario actual...');
-  try {
-    const response = await fetch(`${wpUrl}/wp-json/wp/v2/users/me`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json',
-      }
-    });
-
-    const data = await response.json();
-    
-    if (!response.ok) {
-      console.error('Error al obtener usuario:', data);
-      throw new Error(data.message || 'Error al obtener información del usuario');
-    }
-
-    console.log('Información del usuario obtenida exitosamente');
-    return data;
-  } catch (error) {
-    console.error('Error al obtener usuario:', error);
-    throw error;
-  }
-};
-
 export const loginToWordPress = async (wpUrl: string, token: string) => {
   console.log('Iniciando sesión en WordPress...');
   try {
