@@ -32,7 +32,7 @@ const Login = () => {
   });
 
   const onSubmit = async (values: LoginFormValues) => {
-    if (!wpConfig?.wp_url) {
+    if (!wpConfig?.wp_url || !wpConfig?.wp_username || !wpConfig?.wp_token) {
       toast({
         title: "Error de configuración",
         description: "No se encontró la configuración de WordPress",
@@ -43,13 +43,13 @@ const Login = () => {
 
     try {
       setIsLoggingIn(true);
-      console.log('Iniciando proceso de login con JWT...');
+      console.log('Iniciando proceso de login con JWT usando credenciales de admin...');
       
-      // Obtener token JWT usando las credenciales del usuario que intenta loguearse
+      // Obtener token JWT usando las credenciales del ADMINISTRADOR configuradas
       const response = await getJWTToken(
         wpConfig.wp_url,
-        values.username,
-        values.password
+        wpConfig.wp_username, // Usuario admin configurado
+        wpConfig.wp_token    // Contraseña del admin configurada
       );
 
       if (response.token) {
@@ -57,14 +57,18 @@ const Login = () => {
         // Guardar el token JWT en localStorage
         localStorage.setItem('wp_token', response.token);
         localStorage.setItem('wp_user', JSON.stringify({
-          username: values.username,
+          username: values.username, // Guardamos el usuario que intenta loguearse
           display_name: response.user_display_name,
           email: response.user_email
         }));
         
-        console.log('Redirigiendo a WordPress...');
-        // Redirigir a WordPress con el token
-        window.location.href = `${wpConfig.wp_url}?jwt_token=${response.token}`;
+        console.log('Redirigiendo a WordPress para autenticación del usuario...');
+        // Redirigir a WordPress con las credenciales del usuario que intenta loguearse
+        const loginUrl = new URL(`${wpConfig.wp_url}/wp-login.php`);
+        loginUrl.searchParams.append('jwt_token', response.token);
+        loginUrl.searchParams.append('username', values.username);
+        loginUrl.searchParams.append('password', values.password);
+        window.location.href = loginUrl.toString();
       }
     } catch (error) {
       console.error('Error en login:', error);
