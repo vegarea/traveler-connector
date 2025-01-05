@@ -55,8 +55,10 @@ const Login = () => {
       if (response.token) {
         console.log('Token JWT obtenido, redirigiendo a WordPress...');
         
-        // Redirigir a WordPress con el token
-        window.location.href = `${wpConfig.wp_url}?jwt_token=${response.token}`;
+        // Redirigir a WordPress con el token como parámetro jwt_token
+        const redirectUrl = `${wpConfig.wp_url}?jwt_token=${response.token}`;
+        console.log('Redirigiendo a:', redirectUrl);
+        window.location.href = redirectUrl;
       }
     } catch (error) {
       console.error('Error en login:', error);
