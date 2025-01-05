@@ -5,6 +5,9 @@ export const createAuthHeader = (username: string, token: string) => {
 export const getJWTToken = async (wpUrl: string, username: string, password: string) => {
   console.log('Obteniendo token JWT...');
   try {
+    console.log('Haciendo solicitud a:', `${wpUrl}/wp-json/jwt-auth/v1/token`);
+    console.log('Usuario:', username);
+    
     const response = await fetch(`${wpUrl}/wp-json/jwt-auth/v1/token`, {
       method: 'POST',
       headers: {
@@ -18,12 +21,16 @@ export const getJWTToken = async (wpUrl: string, username: string, password: str
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error('Error al obtener token JWT:', errorData);
+      console.error('Error en respuesta JWT:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorData
+      });
       throw new Error(errorData.message || 'Error al obtener token JWT');
     }
 
     const data = await response.json();
-    console.log('Token JWT obtenido exitosamente:', data);
+    console.log('Token JWT obtenido exitosamente');
     return data;
   } catch (error) {
     console.error('Error en la solicitud JWT:', error);
@@ -60,7 +67,12 @@ export const checkEndpoint = async (endpoint: string, wpUrl: string, wpUsername:
   console.log(`Verificando endpoint: ${endpoint}`);
   try {
     // Primero obtenemos un token JWT usando las credenciales
-    const jwtResponse = await getJWTToken(wpUrl, wpUsername, wpToken);
+    const jwtResponse = await getJWTToken(
+      wpUrl,
+      wpUsername,
+      wpToken
+    );
+
     console.log('Token JWT obtenido para endpoint:', endpoint);
     
     // Usamos el token JWT para la verificación del endpoint
@@ -95,7 +107,11 @@ export const checkEndpoint = async (endpoint: string, wpUrl: string, wpUsername:
 export const fetchUserStructure = async (wpUrl: string, wpUsername: string, wpToken: string) => {
   try {
     // Primero obtenemos un token JWT usando las credenciales
-    const jwtResponse = await getJWTToken(wpUrl, wpUsername, wpToken);
+    const jwtResponse = await getJWTToken(
+      wpUrl,
+      wpUsername,
+      wpToken
+    );
     console.log('Token JWT obtenido para estructura de usuario');
     
     const response = await fetch(`${wpUrl}/wp-json/wp/v2/users/me`, {
