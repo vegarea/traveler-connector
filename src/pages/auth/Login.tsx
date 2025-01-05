@@ -45,7 +45,7 @@ const Login = () => {
       setIsLoggingIn(true);
       console.log('Iniciando proceso de login con JWT...');
       
-      // Obtener token JWT
+      // Obtener token JWT usando las credenciales del usuario que intenta loguearse
       const response = await getJWTToken(
         wpConfig.wp_url,
         values.username,
@@ -53,8 +53,16 @@ const Login = () => {
       );
 
       if (response.token) {
-        console.log('Token JWT obtenido, redirigiendo a WordPress...');
+        console.log('Token JWT obtenido, guardando en localStorage...');
+        // Guardar el token JWT en localStorage
+        localStorage.setItem('wp_token', response.token);
+        localStorage.setItem('wp_user', JSON.stringify({
+          username: values.username,
+          display_name: response.user_display_name,
+          email: response.user_email
+        }));
         
+        console.log('Redirigiendo a WordPress...');
         // Redirigir a WordPress con el token
         window.location.href = `${wpConfig.wp_url}?jwt_token=${response.token}`;
       }
