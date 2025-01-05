@@ -56,6 +56,32 @@ export const validateJWTToken = async (wpUrl: string, token: string) => {
   }
 };
 
+export const loginToWordPress = async (wpUrl: string, jwtToken: string) => {
+  console.log('Iniciando login en WordPress usando plugin Traveler Auth...');
+  try {
+    const response = await fetch(`${wpUrl}/wp-json/traveler-auth/v1/login`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${jwtToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Error en login de WordPress:', errorData);
+      throw new Error(errorData.message || 'Error al iniciar sesión en WordPress');
+    }
+
+    const data = await response.json();
+    console.log('Login en WordPress exitoso:', data);
+    return data;
+  } catch (error) {
+    console.error('Error en la solicitud de login:', error);
+    throw error;
+  }
+};
+
 export const checkEndpoint = async (endpoint: string, wpUrl: string, wpUsername: string, wpToken: string) => {
   console.log(`Verificando endpoint: ${endpoint}`);
   try {

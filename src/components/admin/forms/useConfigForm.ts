@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { configSchema, ConfigFormValues } from './types';
 import { useEffect, useState } from "react";
-import { getJWTToken, validateJWTToken } from "../permissions/utils/wordpressApi";
+import { getJWTToken, validateJWTToken, loginToWordPress } from "../permissions/utils/wordpressApi";
 
 interface ConnectionInfo {
   user_display_name: string;
@@ -84,6 +84,9 @@ export const useConfigForm = () => {
 
       // Validar el token JWT
       await validateJWTToken(configToTest.wp_url, jwtResponse.token);
+
+      // Intentar login en WordPress usando el plugin
+      await loginToWordPress(configToTest.wp_url, jwtResponse.token);
 
       setIsConnected(true);
       setConnectionInfo({
