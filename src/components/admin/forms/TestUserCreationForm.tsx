@@ -54,28 +54,9 @@ export const TestUserCreationForm = () => {
             description: `Usuario ${values.username} creado correctamente`,
           });
           
-          // Crear un formulario oculto para enviar el token a WordPress
-          const form = document.createElement('form');
-          form.method = 'POST';
-          form.action = `${wpConfig.wp_url}/wp-admin/admin-ajax.php`;
-          
-          // Añadir el token como campo oculto
-          const tokenInput = document.createElement('input');
-          tokenInput.type = 'hidden';
-          tokenInput.name = 'token';
-          tokenInput.value = jwtResponse.token;
-          form.appendChild(tokenInput);
-          
-          // Añadir la acción como campo oculto
-          const actionInput = document.createElement('input');
-          actionInput.type = 'hidden';
-          actionInput.name = 'action';
-          actionInput.value = 'jwt_auth_login';
-          form.appendChild(actionInput);
-          
-          // Añadir el formulario al documento y enviarlo
-          document.body.appendChild(form);
-          form.submit();
+          // Guardar token y redirigir a WordPress home
+          localStorage.setItem('wp_token', jwtResponse.token);
+          window.location.href = wpConfig.wp_url;
           return;
         }
       }
