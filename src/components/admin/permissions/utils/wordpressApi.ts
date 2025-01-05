@@ -66,9 +66,6 @@ export const loginToWordPress = async (wpUrl: string, jwtToken: string) => {
   console.log('Token JWT:', jwtToken);
   
   try {
-    // Primero validamos el token JWT antes de intentar el login
-    await validateJWTToken(wpUrl, jwtToken);
-    
     const response = await fetch(`${wpUrl}/wp-json/traveler-auth/v1/login`, {
       method: 'POST',
       headers: {
@@ -79,20 +76,17 @@ export const loginToWordPress = async (wpUrl: string, jwtToken: string) => {
       }
     });
 
-    const responseText = await response.text();
-    console.log('Respuesta completa del login:', {
-      status: response.status,
-      statusText: response.statusText,
-      headers: Object.fromEntries(response.headers.entries()),
-      body: responseText
-    });
-
+    // Clonamos la respuesta antes de consumir el body
+    const responseClone = response.clone();
+    
     let data;
     try {
-      data = JSON.parse(responseText);
+      data = await response.json();
     } catch (e) {
-      console.error('Error al parsear respuesta:', e);
-      throw new Error(`Respuesta inválida del servidor: ${responseText}`);
+      // Si falla el parsing JSON, intentamos obtener el texto
+      const textResponse = await responseClone.text();
+      console.error('Error al parsear respuesta JSON:', textResponse);
+      throw new Error(`Respuesta inválida del servidor: ${textResponse}`);
     }
 
     if (!response.ok) {
@@ -141,37 +135,5 @@ export const checkEndpoint = async (endpoint: string, wpUrl: string, wpUsername:
   } catch (error) {
     console.error(`Error al verificar endpoint ${endpoint}:`, error);
     return false;
-  }
-};
-
-export const fetchUserStructure = async (wpUrl: string, wpUsername: string, wpToken: string) => {
-  try {
-    // Primero obtenemos un token JWT usando las credenciales
-    const jwtResponse = await getJWTToken(wpUrl, wpUsername, wpToken);
-    console.log('Token JWT obtenido para estructura de usuario');
-    
-    const response = await fetch(`${wpUrl}/wp-json/wp/v2/users/me`, {
-      headers: {
-        'Authorization': `Bearer ${jwtResponse.token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      console.error('Error al obtener estructura de usuario:', {
-        status: response.status,
-        statusText: response.statusText,
-        error: errorData
-      });
-      throw new Error('No se pudo obtener la estructura de usuarios');
-    }
-
-    const data = await response.json();
-    console.log('Estructura de usuario obtenida:', data);
-    return data;
-  } catch (error) {
-    console.error('Error al obtener estructura de usuario:', error);
-    throw error;
   }
 };
