@@ -20,7 +20,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login = () => {
   const { toast } = useToast();
-  const { data: wpConfig, isLoading: isConfigLoading } = useWordPressConfig();
+  const { data: wpConfig, isLoading: isConfigLoading, error: configError } = useWordPressConfig();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const form = useForm<LoginFormValues>({
@@ -38,8 +38,8 @@ const Login = () => {
     if (!wpConfig?.wp_url) {
       console.error('No se encontró la configuración de WordPress:', wpConfig);
       toast({
-        title: "Error",
-        description: "No se encontró la configuración de WordPress",
+        title: "Error de configuración",
+        description: "No se encontró la configuración de WordPress. Por favor, configura WordPress en el panel de administración.",
         variant: "destructive",
       });
       return;
