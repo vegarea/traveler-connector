@@ -73,7 +73,7 @@ export const useConfigForm = () => {
       console.log('URL:', configToTest.wp_url);
       console.log('Usuario:', configToTest.wp_username);
 
-      // Obtener token JWT usando usuario y contraseña
+      // Obtener token JWT usando la contraseña normal (no la de aplicación)
       const jwtResponse = await getJWTToken(
         configToTest.wp_url,
         configToTest.wp_username,
