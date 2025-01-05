@@ -5,18 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useWordPressConfig } from '@/components/wordpress/hooks/useWordPressConfig';
 import { getJWTToken, validateJWTToken } from '@/components/admin/permissions/utils/wordpressApi';
 import { Loader2 } from "lucide-react";
-
-const loginSchema = z.object({
-  user_login: z.string().min(1, "El nombre de usuario es requerido"),
-  user_password: z.string().min(1, "La contraseña es requerida"),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
+import { loginSchema, type LoginFormValues } from '@/components/admin/forms/types';
 
 const Login = () => {
   const { toast } = useToast();
@@ -32,7 +25,7 @@ const Login = () => {
   });
 
   const onSubmit = async (values: LoginFormValues) => {
-    if (!wpConfig?.wp_url) {
+    if (!wpConfig?.wp_url || !wpConfig?.wp_username || !wpConfig?.wp_token) {
       toast({
         title: "Error de configuración",
         description: "No se encontró la configuración de WordPress",
@@ -45,13 +38,14 @@ const Login = () => {
       setIsLoggingIn(true);
       console.log('Iniciando proceso de login con JWT...');
       console.log('Usuario intentando login:', values.user_login);
-      console.log('Usando credenciales de admin para obtener token');
       
-      // Aquí usamos las credenciales del ADMIN para obtener el token
+      // Usar credenciales del ADMIN para obtener el token JWT
       const response = await getJWTToken(
         wpConfig.wp_url,
         wpConfig.wp_username,  // Credencial del ADMIN
-        wpConfig.wp_token     // Credencial del ADMIN
+        wpConfig.wp_token,     // Credencial del ADMIN
+        values.user_login,     // Usuario que intenta login
+        values.user_password   // Contraseña del usuario
       );
 
       if (response.token) {

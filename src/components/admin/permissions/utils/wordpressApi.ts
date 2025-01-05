@@ -2,20 +2,22 @@ export const createAuthHeader = (username: string, token: string) => {
   return `Basic ${btoa(`${username}:${token}`)}`;
 };
 
-export const getJWTToken = async (wpUrl: string, wp_username: string, wp_token: string) => {
-  console.log('Obteniendo token JWT...');
+export const getJWTToken = async (wpUrl: string, adminUsername: string, adminToken: string, userLogin: string, userPassword: string) => {
+  console.log('Obteniendo token JWT usando credenciales de admin...');
   try {
-    console.log('Haciendo solicitud a:', `${wpUrl}/wp-json/jwt-auth/v1/token`);
-    console.log('Usuario admin que solicita token:', wp_username);
+    console.log('URL:', wpUrl);
+    console.log('Usuario admin que solicita token:', adminUsername);
+    console.log('Usuario que intenta login:', userLogin);
     
     const response = await fetch(`${wpUrl}/wp-json/jwt-auth/v1/token`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': createAuthHeader(adminUsername, adminToken)
       },
       body: JSON.stringify({
-        username: wp_username,
-        password: wp_token
+        username: userLogin,
+        password: userPassword
       })
     });
 
@@ -30,7 +32,7 @@ export const getJWTToken = async (wpUrl: string, wp_username: string, wp_token: 
     }
 
     const data = await response.json();
-    console.log('Token JWT obtenido exitosamente');
+    console.log('Token JWT obtenido exitosamente para usuario:', userLogin);
     
     // Guardar el token y la información del usuario en localStorage
     localStorage.setItem('wp_token', data.token);
