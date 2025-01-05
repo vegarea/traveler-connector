@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -20,7 +21,8 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login = () => {
   const { toast } = useToast();
-  const { data: wpConfig, isLoading: isConfigLoading, error: configError } = useWordPressConfig();
+  const navigate = useNavigate();
+  const { data: wpConfig, isLoading: isConfigLoading } = useWordPressConfig();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const form = useForm<LoginFormValues>({
@@ -32,14 +34,10 @@ const Login = () => {
   });
 
   const onSubmit = async (values: LoginFormValues) => {
-    console.log('Iniciando proceso de login...');
-    console.log('Valores del formulario:', { username: values.username, password: '***' });
-    
     if (!wpConfig?.wp_url) {
-      console.error('No se encontró la configuración de WordPress:', wpConfig);
       toast({
         title: "Error de configuración",
-        description: "No se encontró la configuración de WordPress. Por favor, configura WordPress en el panel de administración.",
+        description: "No se encontró la configuración de WordPress",
         variant: "destructive",
       });
       return;
@@ -47,10 +45,9 @@ const Login = () => {
 
     try {
       setIsLoggingIn(true);
-      console.log('Intentando obtener token JWT de WordPress...');
-      console.log('URL de WordPress:', wpConfig.wp_url);
+      console.log('Iniciando proceso de login con JWT...');
       
-      // Primero obtenemos el token JWT
+      // Obtener token JWT
       const response = await getJWTToken(
         wpConfig.wp_url,
         values.username,
@@ -58,50 +55,19 @@ const Login = () => {
       );
 
       if (response.token) {
-        console.log('Token JWT obtenido exitosamente');
+        // Guardar token JWT
+        localStorage.setItem('wp_token', response.token);
         
-        // Construir la URL de redirección
-        const redirectUrl = `${wpConfig.auth_callback_url}?token=${response.token}`;
-        console.log('URL de redirección:', redirectUrl);
-        
-        // Redirigir a WordPress con los parámetros correctos
-        const wpLoginUrl = `${wpConfig.wp_url}/wp-login.php`;
-        console.log('URL de login de WordPress:', wpLoginUrl);
-        
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = wpLoginUrl;
-        form.style.display = 'none';
+        toast({
+          title: "¡Bienvenido!",
+          description: `Has iniciado sesión como ${values.username}`,
+        });
 
-        // Agregar los campos necesarios
-        const usernameInput = document.createElement('input');
-        usernameInput.type = 'hidden';
-        usernameInput.name = 'log';
-        usernameInput.value = values.username;
-        form.appendChild(usernameInput);
-
-        const passwordInput = document.createElement('input');
-        passwordInput.type = 'hidden';
-        passwordInput.name = 'pwd';
-        passwordInput.value = values.password;
-        form.appendChild(passwordInput);
-
-        const redirectInput = document.createElement('input');
-        redirectInput.type = 'hidden';
-        redirectInput.name = 'redirect_to';
-        redirectInput.value = redirectUrl;
-        form.appendChild(redirectInput);
-
-        console.log('Formulario preparado, enviando...');
-        document.body.appendChild(form);
-        form.submit();
+        // Redirigir al perfil del usuario
+        navigate(`/u/${values.username}`);
       }
     } catch (error) {
-      console.error('Error detallado en login:', error);
-      if (error instanceof Error) {
-        console.error('Mensaje de error:', error.message);
-        console.error('Stack trace:', error.stack);
-      }
+      console.error('Error en login:', error);
       toast({
         title: "Error de autenticación",
         description: error instanceof Error ? error.message : "Error al intentar iniciar sesión",
