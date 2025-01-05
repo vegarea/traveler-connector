@@ -12,103 +12,105 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Agregar endpoint para autenticación
-add_action('rest_api_init', function () {
-    register_rest_route('traveler-auth/v1', '/login', array(
-        'methods' => 'POST',
-        'callback' => 'traveler_handle_login',
-        'permission_callback' => function() {
-            return true; // Permitir acceso público al endpoint
-        }
-    ));
+// Agregar menú de configuración
+add_action('admin_menu', function() {
+    add_options_page(
+        'Traveler Auth',
+        'Traveler Auth',
+        'manage_options',
+        'traveler-auth',
+        'traveler_auth_settings_page'
+    );
 });
 
-function traveler_handle_login($request) {
-    error_log('Iniciando proceso de login en Traveler Auth');
-    
-    // Obtener el token JWT del header
-    $auth_header = $request->get_header('Authorization');
-    if (!$auth_header || strpos($auth_header, 'Bearer ') !== 0) {
-        error_log('Token no proporcionado o formato incorrecto');
-        return new WP_Error(
-            'no_token',
-            'Token no proporcionado o formato incorrecto',
-            array('status' => 401)
-        );
+// Página de configuración
+function traveler_auth_settings_page() {
+    if (!current_user_can('manage_options')) {
+        return;
     }
 
-    // Extraer el token JWT
-    $token = str_replace('Bearer ', '', $auth_header);
-    error_log('Token recibido: ' . $token);
+    if (isset($_POST['traveler_auth_app_url'])) {
+        update_option('traveler_auth_app_url', sanitize_text_field($_POST['traveler_auth_app_url']));
+        echo '<div class="notice notice-success"><p>Configuración guardada.</p></div>';
+    }
 
-    // Verificar que la clave secreta JWT está configurada
-    if (!defined('JWT_AUTH_SECRET_KEY')) {
-        error_log('JWT_AUTH_SECRET_KEY no está definida en wp-config.php');
-        return new WP_Error(
-            'jwt_auth_bad_config',
-            'JWT no está configurado correctamente',
-            array('status' => 403)
-        );
+    $app_url = get_option('traveler_auth_app_url', '');
+    ?>
+    <div class="wrap">
+        <h1>Configuración de Traveler Auth</h1>
+        <form method="post">
+            <table class="form-table">
+                <tr>
+                    <th scope="row">URL de la Aplicación</th>
+                    <td>
+                        <input type="url" name="traveler_auth_app_url" value="<?php echo esc_attr($app_url); ?>" class="regular-text">
+                        <p class="description">URL base de tu aplicación Traveler (ej: https://app.traveler.com)</p>
+                    </td>
+                </tr>
+            </table>
+            <?php submit_button('Guardar Cambios'); ?>
+        </form>
+    </div>
+    <?php
+}
+
+// Interceptar login y redirigir
+add_filter('login_redirect', function($redirect_to, $requested_redirect_to, $user) {
+    if (!is_wp_error($user)) {
+        try {
+            // Obtener la URL de la app
+            $app_url = get_option('traveler_auth_app_url');
+            if (empty($app_url)) {
+                error_log('Traveler Auth: URL de la aplicación no configurada');
+                return $redirect_to;
+            }
+
+            // Generar token JWT usando el plugin JWT Authentication
+            $token = generate_jwt_token($user);
+            if (empty($token)) {
+                error_log('Traveler Auth: No se pudo generar el token JWT');
+                return $redirect_to;
+            }
+
+            // Construir URL de redirección con el token
+            $auth_url = trailingslashit($app_url) . 'auth/wordpress/callback?token=' . urlencode($token);
+            
+            error_log('Traveler Auth: Redirigiendo a ' . $auth_url);
+            return $auth_url;
+        } catch (Exception $e) {
+            error_log('Traveler Auth Error: ' . $e->getMessage());
+            return $redirect_to;
+        }
+    }
+    return $redirect_to;
+}, 99, 3);
+
+// Función auxiliar para generar token JWT
+function generate_jwt_token($user) {
+    // Verificar que el plugin JWT Authentication está activo
+    if (!class_exists('JWT_AUTH_PUBLIC')) {
+        error_log('Traveler Auth: Plugin JWT Authentication no está instalado');
+        return null;
     }
 
     try {
-        // Validar el token usando la biblioteca JWT
-        $decoded_token = JWT::decode(
-            $token,
-            new Key(JWT_AUTH_SECRET_KEY, 'HS256')
-        );
-        
-        error_log('Token decodificado: ' . print_r($decoded_token, true));
+        // Generar token JWT usando el plugin JWT Authentication
+        $jwt_auth = new JWT_AUTH_PUBLIC('jwt-auth', '1.0.0');
+        $token_response = $jwt_auth->generate_token([
+            'username' => $user->user_login,
+            'password' => '' // No necesitamos la contraseña aquí
+        ]);
 
-        // Verificar que el token contiene la información del usuario
-        if (!isset($decoded_token->data->user->id)) {
-            error_log('Token no contiene ID de usuario');
-            return new WP_Error(
-                'invalid_token',
-                'Token inválido - no contiene ID de usuario',
-                array('status' => 401)
-            );
+        if (is_wp_error($token_response)) {
+            error_log('Traveler Auth: Error generando token JWT - ' . $token_response->get_error_message());
+            return null;
         }
 
-        // Obtener el usuario por ID
-        $user = get_user_by('id', $decoded_token->data->user->id);
-        if (!$user) {
-            error_log('Usuario no encontrado: ' . $decoded_token->data->user->id);
-            return new WP_Error(
-                'user_not_found',
-                'Usuario no encontrado',
-                array('status' => 404)
-            );
-        }
-
-        // Iniciar sesión
-        wp_set_current_user($user->ID);
-        wp_set_auth_cookie($user->ID, true);
-
-        error_log('Login exitoso para usuario: ' . $user->user_login);
-
-        return array(
-            'success' => true,
-            'user_id' => $user->ID,
-            'user_login' => $user->user_login,
-            'user_email' => $user->user_email,
-            'display_name' => $user->display_name
-        );
-
+        return $token_response->data->token;
     } catch (Exception $e) {
-        error_log('Error procesando token JWT: ' . $e->getMessage());
-        return new WP_Error(
-            'invalid_token',
-            'Token inválido: ' . $e->getMessage(),
-            array('status' => 401)
-        );
+        error_log('Traveler Auth Error: ' . $e->getMessage());
+        return null;
     }
-}
-
-// Asegurarnos de que la biblioteca JWT está disponible
-if (!class_exists('JWT')) {
-    require_once(plugin_dir_path(__FILE__) . 'vendor/firebase/php-jwt/src/JWT.php');
-    require_once(plugin_dir_path(__FILE__) . 'vendor/firebase/php-jwt/src/Key.php');
 }
 
 // Agregar headers CORS
