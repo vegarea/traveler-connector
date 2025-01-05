@@ -67,13 +67,24 @@ export const loginToWordPress = async (wpUrl: string, jwtToken: string) => {
       }
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Error en login de WordPress:', errorData);
-      throw new Error(errorData.message || 'Error al iniciar sesión en WordPress');
+    // Primero guardamos el texto de la respuesta
+    const responseText = await response.text();
+    console.log('Respuesta del login:', responseText);
+
+    // Intentamos parsear el texto como JSON
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (e) {
+      console.error('Error al parsear respuesta:', e);
+      throw new Error('Respuesta inválida del servidor');
     }
 
-    const data = await response.json();
+    if (!response.ok) {
+      console.error('Error en login de WordPress:', data);
+      throw new Error(data.message || 'Error al iniciar sesión en WordPress');
+    }
+
     console.log('Login en WordPress exitoso:', data);
     return data;
   } catch (error) {
