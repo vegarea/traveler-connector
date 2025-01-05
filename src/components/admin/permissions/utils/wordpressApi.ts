@@ -122,38 +122,17 @@ export const redirectToWordPressWithToken = async (wpUrl: string, token: string)
   console.log('Token JWT (primeros 20 caracteres):', token.substring(0, 20) + '...');
   
   try {
-    // Primero validamos que el token sea válido antes de redirigir
+    // Primero validamos que el token sea válido
     await validateJWTToken(wpUrl, token);
     
-    // Creamos un formulario oculto para enviar el token de manera segura
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = wpUrl;
-    form.style.display = 'none';
-
-    // El token JWT debe enviarse como Authorization Bearer
-    const tokenInput = document.createElement('input');
-    tokenInput.type = 'hidden';
-    tokenInput.name = 'wp_jwt_token';  // Nombre específico que WordPress espera
-    tokenInput.value = token;
-    form.appendChild(tokenInput);
-
-    // Agregamos un campo de acción para que WordPress sepa que es una autenticación JWT
-    const actionInput = document.createElement('input');
-    actionInput.type = 'hidden';
-    actionInput.name = 'wp_jwt_auth';
-    actionInput.value = '1';
-    form.appendChild(actionInput);
-
-    // Agregamos el formulario al documento y lo enviamos
-    document.body.appendChild(form);
-    console.log('Enviando formulario con token JWT a WordPress...');
-    console.log('Campos del formulario:', {
-      wp_jwt_token: tokenInput.value.substring(0, 20) + '...',
-      wp_jwt_auth: actionInput.value
-    });
+    // Creamos una URL con el token como parámetro de autenticación
+    const url = new URL(wpUrl);
+    url.searchParams.append('auth_token', token);
     
-    form.submit();
+    console.log('Redirigiendo a:', url.toString());
+    
+    // Redirigimos usando window.location para mantener el token en la URL
+    window.location.href = url.toString();
   } catch (error) {
     console.error('Error al redirigir a WordPress:', error);
     throw new Error('Error al redirigir a WordPress con el token JWT');
