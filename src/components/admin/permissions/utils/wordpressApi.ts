@@ -118,31 +118,41 @@ export const validateJWTToken = async (wpUrl: string, token: string) => {
 
 export const redirectToWordPressWithToken = async (wpUrl: string, token: string) => {
   console.log('Redirigiendo a WordPress con token JWT...');
+  console.log('URL de WordPress:', wpUrl);
+  console.log('Token JWT (primeros 20 caracteres):', token.substring(0, 20) + '...');
   
   try {
-    // Primero, creamos un formulario oculto para enviar el token de manera segura
+    // Primero validamos que el token sea válido antes de redirigir
+    await validateJWTToken(wpUrl, token);
+    
+    // Creamos un formulario oculto para enviar el token de manera segura
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = wpUrl;  // Redirigimos directamente al home de WordPress
+    form.action = wpUrl;
     form.style.display = 'none';
 
-    // Agregamos el token JWT como campo oculto
+    // El token JWT debe enviarse como Authorization Bearer
     const tokenInput = document.createElement('input');
     tokenInput.type = 'hidden';
-    tokenInput.name = 'jwt_token';
+    tokenInput.name = 'wp_jwt_token';  // Nombre específico que WordPress espera
     tokenInput.value = token;
     form.appendChild(tokenInput);
 
-    // Agregamos un nonce para seguridad adicional
-    const nonceInput = document.createElement('input');
-    nonceInput.type = 'hidden';
-    nonceInput.name = 'jwt_auth_nonce';
-    nonceInput.value = btoa(Date.now().toString());
-    form.appendChild(nonceInput);
+    // Agregamos un campo de acción para que WordPress sepa que es una autenticación JWT
+    const actionInput = document.createElement('input');
+    actionInput.type = 'hidden';
+    actionInput.name = 'wp_jwt_auth';
+    actionInput.value = '1';
+    form.appendChild(actionInput);
 
     // Agregamos el formulario al documento y lo enviamos
     document.body.appendChild(form);
     console.log('Enviando formulario con token JWT a WordPress...');
+    console.log('Campos del formulario:', {
+      wp_jwt_token: tokenInput.value.substring(0, 20) + '...',
+      wp_jwt_auth: actionInput.value
+    });
+    
     form.submit();
   } catch (error) {
     console.error('Error al redirigir a WordPress:', error);
