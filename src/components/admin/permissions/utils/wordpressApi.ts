@@ -16,13 +16,13 @@ export const getJWTToken = async (wpUrl: string, username: string, password: str
       })
     });
 
+    const data = await response.json();
+    
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Error al obtener token JWT:', errorData);
-      throw new Error(errorData.message || 'Error al obtener token JWT');
+      console.error('Error al obtener token JWT:', data);
+      throw new Error(data.message || 'Error al obtener token JWT');
     }
 
-    const data = await response.json();
     console.log('Token JWT obtenido exitosamente:', data);
     return data;
   } catch (error) {
@@ -41,13 +41,13 @@ export const validateJWTToken = async (wpUrl: string, token: string) => {
       }
     });
 
+    const data = await response.json();
+    
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Error al validar token JWT:', errorData);
-      throw new Error(errorData.message || 'Token JWT inválido');
+      console.error('Error al validar token JWT:', data);
+      throw new Error(data.message || 'Token JWT inválido');
     }
 
-    const data = await response.json();
     console.log('Token JWT validado exitosamente:', data);
     return data;
   } catch (error) {
@@ -58,7 +58,13 @@ export const validateJWTToken = async (wpUrl: string, token: string) => {
 
 export const loginToWordPress = async (wpUrl: string, jwtToken: string) => {
   console.log('Iniciando login en WordPress usando plugin Traveler Auth...');
+  console.log('URL:', wpUrl);
+  console.log('Token JWT:', jwtToken);
+  
   try {
+    // Primero validamos el token JWT antes de intentar el login
+    await validateJWTToken(wpUrl, jwtToken);
+    
     const response = await fetch(`${wpUrl}/wp-json/traveler-auth/v1/login`, {
       method: 'POST',
       headers: {
@@ -67,17 +73,20 @@ export const loginToWordPress = async (wpUrl: string, jwtToken: string) => {
       }
     });
 
-    // Guardamos la respuesta en una variable
     const responseText = await response.text();
-    console.log('Respuesta del login:', responseText);
+    console.log('Respuesta completa del login:', {
+      status: response.status,
+      statusText: response.statusText,
+      headers: Object.fromEntries(response.headers.entries()),
+      body: responseText
+    });
 
-    // Intentamos parsear la respuesta como JSON
     let data;
     try {
       data = JSON.parse(responseText);
     } catch (e) {
       console.error('Error al parsear respuesta:', e);
-      throw new Error('Respuesta inválida del servidor');
+      throw new Error(`Respuesta inválida del servidor: ${responseText}`);
     }
 
     if (!response.ok) {
